@@ -8,15 +8,6 @@
 #include "../include/ui/sdl_viewer.h"
 #include "../include/core/gol_1d.h"
 
-unsigned char *alloc_grid(int rows, int cols);
-void random_fill(unsigned char *grid, int rows, int cols, double alive_prob, unsigned int seed);
-int write_pgm(const char *path, const unsigned char *grid, int rows, int cols);
-
-int sdl_init_viewer(int rows, int cols, int scale);
-int sdl_render_grid(const unsigned char *grid, int rows, int cols, int delay_ms);
-void sdl_wait_for_enter(void);
-void sdl_close_viewer(void);
-
 static int owner_cells(int n, int size, int rank) {
     int base = n / size;
     int rem = n % size;
@@ -125,7 +116,15 @@ static void run_gol_1d_internal(
         );
 
         if (rank == 0 && use_sdl) {
-            running = sdl_render_grid(history, steps + 1, global_n, delay_ms);
+            running = sdl_render_grid(
+                history,
+                steps + 1,
+                global_n,
+                delay_ms,
+                "1D",
+                step,
+                steps
+            );
         }
 
         MPI_Bcast(&running, 1, MPI_INT, 0, MPI_COMM_WORLD);

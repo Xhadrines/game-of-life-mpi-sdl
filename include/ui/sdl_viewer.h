@@ -21,7 +21,10 @@ int sdl_render_grid(
     const unsigned char *grid,
     int rows,
     int cols,
-    int delay_ms
+    int delay_ms,
+    const char *mode_name,
+    int generation,
+    int total_generations
 );
 
 void sdl_wait_for_enter(void);

@@ -473,10 +473,31 @@ int sdl_init_viewer(int rows, int cols, int scale) {
     return init_window("Game of Life MPI - running", width, height);
 }
 
-int sdl_render_grid(const unsigned char *grid, int rows, int cols, int delay_ms) {
+int sdl_render_grid(
+    const unsigned char *grid,
+    int rows,
+    int cols,
+    int delay_ms,
+    const char *mode_name,
+    int generation,
+    int total_generations
+) {
     static int paused = 0;
 
     SDL_Event event;
+
+    char title[256];
+
+    snprintf(
+        title,
+        sizeof(title),
+        "Game of Life MPI - %s - Generation %d/%d",
+        mode_name,
+        generation,
+        total_generations
+    );
+
+    SDL_SetWindowTitle(window, title);
 
     while (SDL_PollEvent(&event)) {
 

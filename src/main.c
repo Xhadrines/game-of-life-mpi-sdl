@@ -7,22 +7,6 @@
 #include "../include/core/gol_2d.h"
 #include "../include/ui/sdl_viewer.h"
 
-void run_gol_1d(int global_n, int steps, const char *out_path);
-void run_gol_1d_visual(int global_n, int steps, const char *out_path, int scale, int delay_ms);
-
-void run_gol_2d(int rows, int cols, int steps, const char *out_path);
-void run_gol_2d_visual(int rows, int cols, int steps, const char *out_path, int scale, int delay_ms);
-
-int sdl_app_menu(
-    int mpi_size,
-    int *mode,
-    int *rows,
-    int *cols,
-    int *steps,
-    int *scale,
-    int *delay_ms
-);
-
 int main(int argc, char **argv) {
     MPI_Init(&argc, &argv);
 

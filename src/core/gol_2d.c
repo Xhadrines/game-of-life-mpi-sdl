@@ -8,15 +8,6 @@
 #include "../include/ui/sdl_viewer.h"
 #include "../include/core/gol_2d.h"
 
-unsigned char *alloc_grid(int rows, int cols);
-void random_fill(unsigned char *grid, int rows, int cols, double alive_prob, unsigned int seed);
-int write_pgm(const char *path, const unsigned char *grid, int rows, int cols);
-
-int sdl_init_viewer(int rows, int cols, int scale);
-int sdl_render_grid(const unsigned char *grid, int rows, int cols, int delay_ms);
-void sdl_wait_for_enter(void);
-void sdl_close_viewer(void);
-
 static int owner_rows(int rows, int size, int rank) {
     int base = rows / size;
     int rem = rows % size;
@@ -196,7 +187,15 @@ static void run_gol_2d_internal(
             );
 
             if (rank == 0) {
-                running = sdl_render_grid(global, rows, cols, delay_ms);
+                running = sdl_render_grid(
+                    global,
+                    rows,
+                    cols,
+                    delay_ms,
+                    "2D",
+                    step + 1,
+                    steps
+                );
             }
 
             MPI_Bcast(&running, 1, MPI_INT, 0, MPI_COMM_WORLD);
