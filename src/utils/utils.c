@@ -1,7 +1,5 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <sys/stat.h>
-#include <sys/types.h>
 
 #include "../include/utils/utils.h"
 
@@ -23,9 +21,6 @@ void random_fill(unsigned char *grid, int rows, int cols, double alive_prob, uns
 }
 
 int write_pgm(const char *path, const unsigned char *grid, int rows, int cols) {
-    
-    mkdir("output", 0777);
-
     FILE *f = fopen(path, "w");
 
     if (!f) {

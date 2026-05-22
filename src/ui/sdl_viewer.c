@@ -14,8 +14,12 @@ static TTF_Font *font_large = NULL;
 
 static int scale_global = 4;
 
+static int is_1d_mode(int mode) {
+    return mode == 1 || mode == 3;
+}
+
 static int is_valid_config(int mpi_size, int mode, int rows, int cols) {
-    if (mode == 1) {
+    if (is_1d_mode(mode)) {
         return rows % mpi_size == 0;
     }
 
@@ -23,7 +27,7 @@ static int is_valid_config(int mpi_size, int mode, int rows, int cols) {
 }
 
 static void fix_invalid_value(int mpi_size, int mode, int *rows, int *cols) {
-    if (mode == 1) {
+    if (is_1d_mode(mode)) {
         while (*rows % mpi_size != 0) {
             (*rows)++;
         }
@@ -59,7 +63,7 @@ static int init_window(const char *title, int width, int height) {
     font_large = load_font(34);
 
     if (!font_small || !font_medium || !font_large) {
-        fprintf(stderr, "Nu am gasit font. Instaleaza: sudo pacman -S ttf-dejavu\n");
+        fprintf(stderr, "Nu am gasit font. Verifica assets/fonts/DejaVuSans.ttf\n");
     }
 
     window = SDL_CreateWindow(
@@ -206,6 +210,22 @@ static void draw_field(SDL_Rect rect, int active, const char *name, int value) {
     draw_text(buffer, rect.x + 20, rect.y + 50, font_medium);
 }
 
+static void set_defaults_1d(int mpi_size, int *rows, int *cols, int *steps, int *scale, int *delay_ms) {
+    *rows = 500 * mpi_size;
+    *cols = 1;
+    *steps = 500 * mpi_size;
+    *scale = 1;
+    *delay_ms = 10;
+}
+
+static void set_defaults_2d(int mpi_size, int *rows, int *cols, int *steps, int *scale, int *delay_ms) {
+    *rows = 125 * mpi_size;
+    *cols = 125 * mpi_size;
+    *steps = 500 * mpi_size;
+    *scale = 2;
+    *delay_ms = 10;
+}
+
 int sdl_app_menu(
     int mpi_size,
     int *mode,
@@ -239,7 +259,7 @@ int sdl_app_menu(
     fix_invalid_value(mpi_size, *mode, rows, cols);
 
     while (running) {
-        int total_fields = *mode == 1 ? 4 : 5;
+        int total_fields = is_1d_mode(*mode) ? 4 : 5;
         int valid = is_valid_config(mpi_size, *mode, *rows, *cols);
 
         if (field >= total_fields) {
@@ -259,22 +279,14 @@ int sdl_app_menu(
 
                 if (inside(button_1d, x, y)) {
                     *mode = 1;
-                    *rows = 500 * mpi_size;
-                    *cols = 1;
-                    *steps = 500 * mpi_size;
-                    *scale = 1;
-                    *delay_ms = 10;
+                    set_defaults_1d(mpi_size, rows, cols, steps, scale, delay_ms);
                     field = 0;
                     fix_invalid_value(mpi_size, *mode, rows, cols);
                 }
 
                 if (inside(button_2d, x, y)) {
                     *mode = 2;
-                    *rows = 125 * mpi_size;
-                    *cols = 125 * mpi_size;
-                    *steps = 500 * mpi_size;
-                    *scale = 2;
-                    *delay_ms = 10;
+                    set_defaults_2d(mpi_size, rows, cols, steps, scale, delay_ms);
                     field = 0;
                     fix_invalid_value(mpi_size, *mode, rows, cols);
                 }
@@ -283,7 +295,7 @@ int sdl_app_menu(
                 if (inside(field_2, x, y)) field = 1;
                 if (inside(field_3, x, y)) field = 2;
                 if (inside(field_4, x, y)) field = 3;
-                if (*mode == 2 && inside(field_5, x, y)) field = 4;
+                if (!is_1d_mode(*mode) && inside(field_5, x, y)) field = 4;
 
                 if (inside(run_button, x, y)) {
                     if (is_valid_config(mpi_size, *mode, *rows, *cols)) {
@@ -309,22 +321,28 @@ int sdl_app_menu(
 
                 else if (key == SDLK_1) {
                     *mode = 1;
-                    *rows = 500 * mpi_size;
-                    *cols = 1;
-                    *steps = 500 * mpi_size;
-                    *scale = 1;
-                    *delay_ms = 10;
+                    set_defaults_1d(mpi_size, rows, cols, steps, scale, delay_ms);
                     field = 0;
                     fix_invalid_value(mpi_size, *mode, rows, cols);
                 }
 
                 else if (key == SDLK_2) {
                     *mode = 2;
-                    *rows = 125 * mpi_size;
-                    *cols = 125 * mpi_size;
-                    *steps = 500 * mpi_size;
-                    *scale = 2;
-                    *delay_ms = 10;
+                    set_defaults_2d(mpi_size, rows, cols, steps, scale, delay_ms);
+                    field = 0;
+                    fix_invalid_value(mpi_size, *mode, rows, cols);
+                }
+
+                else if (key == SDLK_3) {
+                    *mode = 3;
+                    set_defaults_1d(mpi_size, rows, cols, steps, scale, delay_ms);
+                    field = 0;
+                    fix_invalid_value(mpi_size, *mode, rows, cols);
+                }
+
+                else if (key == SDLK_4) {
+                    *mode = 4;
+                    set_defaults_2d(mpi_size, rows, cols, steps, scale, delay_ms);
                     field = 0;
                     fix_invalid_value(mpi_size, *mode, rows, cols);
                 }
@@ -340,7 +358,7 @@ int sdl_app_menu(
                 }
 
                 else if (key == SDLK_UP) {
-                    if (*mode == 1) {
+                    if (is_1d_mode(*mode)) {
                         if (field == 0) *rows += mpi_size;
                         if (field == 1) *steps += 100;
                         if (field == 2) *scale += 1;
@@ -357,7 +375,7 @@ int sdl_app_menu(
                 }
 
                 else if (key == SDLK_DOWN) {
-                    if (*mode == 1) {
+                    if (is_1d_mode(*mode)) {
                         if (field == 0 && *rows > mpi_size) *rows -= mpi_size;
                         if (field == 1 && *steps > 100) *steps -= 100;
                         if (field == 2 && *scale > 1) *scale -= 1;
@@ -374,18 +392,10 @@ int sdl_app_menu(
                 }
 
                 else if (key == SDLK_r) {
-                    if (*mode == 1) {
-                        *rows = 500 * mpi_size;
-                        *cols = 1;
-                        *steps = 500 * mpi_size;
-                        *scale = 1;
-                        *delay_ms = 10;
+                    if (is_1d_mode(*mode)) {
+                        set_defaults_1d(mpi_size, rows, cols, steps, scale, delay_ms);
                     } else {
-                        *rows = 125 * mpi_size;
-                        *cols = 125 * mpi_size;
-                        *steps = 500 * mpi_size;
-                        *scale = 2;
-                        *delay_ms = 10;
+                        set_defaults_2d(mpi_size, rows, cols, steps, scale, delay_ms);
                     }
 
                     fix_invalid_value(mpi_size, *mode, rows, cols);
@@ -400,13 +410,24 @@ int sdl_app_menu(
 
         draw_text("Conway Game of Life", 430, 30, font_large);
 
-        draw_text("Apasa 1 pentru modul 1D", button_1d.x + 60, button_1d.y - 35, font_small);
-        draw_text("Apasa 2 pentru modul 2D", button_2d.x + 60, button_2d.y - 35, font_small);
-
-        draw_button(button_1d, *mode == 1, 70, 130, 180, "1D");
-        draw_button(button_2d, *mode == 2, 46, 160, 67, "2D");
+        draw_text("1 = MPI 1D | 3 = SERIAL 1D", button_1d.x + 20, button_1d.y - 35, font_small);
+        draw_text("2 = MPI 2D | 4 = SERIAL 2D", button_2d.x + 20, button_2d.y - 35, font_small);
 
         if (*mode == 1) {
+            draw_button(button_1d, 1, 70, 130, 180, "MPI 1D");
+            draw_button(button_2d, 0, 46, 160, 67, "MPI 2D");
+        } else if (*mode == 2) {
+            draw_button(button_1d, 0, 70, 130, 180, "MPI 1D");
+            draw_button(button_2d, 1, 46, 160, 67, "MPI 2D");
+        } else if (*mode == 3) {
+            draw_button(button_1d, 1, 70, 130, 180, "SERIAL 1D");
+            draw_button(button_2d, 0, 46, 160, 67, "MPI 2D");
+        } else {
+            draw_button(button_1d, 0, 70, 130, 180, "MPI 1D");
+            draw_button(button_2d, 1, 46, 160, 67, "SERIAL 2D");
+        }
+
+        if (is_1d_mode(*mode)) {
             draw_field(field_1, field == 0, "cells", *rows);
             draw_field(field_2, field == 1, "steps", *steps);
             draw_field(field_3, field == 2, "scale", *scale);
@@ -431,7 +452,7 @@ int sdl_app_menu(
             snprintf(
                 info,
                 sizeof(info),
-                "MPI processes: %d | 1=1D | 2=2D | LEFT/RIGHT=select | UP/DOWN=modify | R=reset | ENTER=run | ESC=exit",
+                "MPI processes: %d | 1=MPI1D | 2=MPI2D | 3=SERIAL1D | 4=SERIAL2D | LEFT/RIGHT=select | UP/DOWN=modify | R=reset | ENTER=run",
                 mpi_size
             );
         } else {
@@ -443,7 +464,7 @@ int sdl_app_menu(
             );
         }
 
-        draw_text(info, 140, 720, font_small);
+        draw_text(info, 80, 720, font_small);
 
         SDL_RenderPresent(renderer);
         SDL_Delay(16);

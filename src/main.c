@@ -3,8 +3,10 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "../include/core/gol_1d.h"
-#include "../include/core/gol_2d.h"
+#include "../include/core/parallel/gol_1d_parallel.h"
+#include "../include/core/parallel/gol_2d_parallel.h"
+#include "../include/core/serial/gol_1d_serial.h"
+#include "../include/core/serial/gol_2d_serial.h"
 #include "../include/ui/sdl_viewer.h"
 
 int main(int argc, char **argv) {
@@ -42,10 +44,52 @@ int main(int argc, char **argv) {
 
             if (mode == 0) {
                 app_running = 0;
-            } else if (mode == 1) {
-                run_gol_1d_visual(rows, steps, "output/rezultat_1d_sdl.pgm", scale, delay_ms);
-            } else if (mode == 2) {
-                run_gol_2d_visual(rows, cols, steps, "output/rezultat_2d_sdl.pgm", scale, delay_ms);
+            }
+
+            else if (mode == 1) {
+                run_gol_1d_parallel_visual(
+                    rows,
+                    steps,
+                    "output/rezultat_1d_parallel.pgm",
+                    scale,
+                    delay_ms
+                );
+            }
+
+            else if (mode == 2) {
+                run_gol_2d_parallel_visual(
+                    rows,
+                    cols,
+                    steps,
+                    "output/rezultat_2d_parallel.pgm",
+                    scale,
+                    delay_ms
+                );
+            }
+
+            else if (mode == 3) {
+                if (rank == 0) {
+                    run_gol_1d_serial_visual(
+                        rows,
+                        steps,
+                        "output/rezultat_1d_serial.pgm",
+                        scale,
+                        delay_ms
+                    );
+                }
+            }
+
+            else if (mode == 4) {
+                if (rank == 0) {
+                    run_gol_2d_serial_visual(
+                        rows,
+                        cols,
+                        steps,
+                        "output/rezultat_2d_serial.pgm",
+                        scale,
+                        delay_ms
+                    );
+                }
             }
         }
 
@@ -53,12 +97,29 @@ int main(int argc, char **argv) {
         return 0;
     }
 
-    if (strcmp(argv[1], "1d") == 0 && argc == 5) {
-        run_gol_1d(atoi(argv[2]), atoi(argv[3]), argv[4]);
+    if (strcmp(argv[1], "parallel1d") == 0 && argc == 5) {
+        run_gol_1d_parallel(atoi(argv[2]), atoi(argv[3]), argv[4]);
     }
 
-    else if (strcmp(argv[1], "2d") == 0 && argc == 6) {
-        run_gol_2d(atoi(argv[2]), atoi(argv[3]), atoi(argv[4]), argv[5]);
+    else if (strcmp(argv[1], "parallel2d") == 0 && argc == 6) {
+        run_gol_2d_parallel(atoi(argv[2]), atoi(argv[3]), atoi(argv[4]), argv[5]);
+    }
+
+    else if (strcmp(argv[1], "serial1d") == 0 && argc == 5) {
+        run_gol_1d_serial(
+            atoi(argv[2]),
+            atoi(argv[3]),
+            argv[4]
+        );
+    }
+
+    else if (strcmp(argv[1], "serial2d") == 0 && argc == 6) {
+        run_gol_2d_serial(
+            atoi(argv[2]),
+            atoi(argv[3]),
+            atoi(argv[4]),
+            argv[5]
+        );
     }
 
     MPI_Finalize();

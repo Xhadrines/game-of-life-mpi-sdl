@@ -6,7 +6,7 @@
 
 #include "../include/utils/utils.h"
 #include "../include/ui/sdl_viewer.h"
-#include "../include/core/gol_1d.h"
+#include "../include/core/parallel/gol_1d_parallel.h"
 
 static int owner_cells(int n, int size, int rank) {
     int base = n / size;
@@ -194,11 +194,11 @@ static void run_gol_1d_internal(
     }
 }
 
-void run_gol_1d(int global_n, int steps, const char *out_path) {
+void run_gol_1d_parallel(int global_n, int steps, const char *out_path) {
     run_gol_1d_internal(global_n, steps, out_path, 0, 1, 0);
 }
 
-void run_gol_1d_visual(int global_n, int steps, const char *out_path, int scale, int delay_ms) {
+void run_gol_1d_parallel_visual(int global_n, int steps, const char *out_path, int scale, int delay_ms) {
     if (scale <= 0) scale = 1;
     if (delay_ms < 0) delay_ms = 10;
 

@@ -6,7 +6,7 @@
 
 #include "../include/utils/utils.h"
 #include "../include/ui/sdl_viewer.h"
-#include "../include/core/gol_2d.h"
+#include "../include/core/parallel/gol_2d_parallel.h"
 
 static int owner_rows(int rows, int size, int rank) {
     int base = rows / size;
@@ -235,11 +235,11 @@ static void run_gol_2d_internal(
     }
 }
 
-void run_gol_2d(int rows, int cols, int steps, const char *out_path) {
+void run_gol_2d_parallel(int rows, int cols, int steps, const char *out_path) {
     run_gol_2d_internal(rows, cols, steps, out_path, 0, 1, 0);
 }
 
-void run_gol_2d_visual(int rows, int cols, int steps, const char *out_path, int scale, int delay_ms) {
+void run_gol_2d_parallel_visual(int rows, int cols, int steps, const char *out_path, int scale, int delay_ms) {
     if (scale <= 0) scale = 4;
     if (delay_ms < 0) delay_ms = 20;
 
