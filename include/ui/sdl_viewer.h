@@ -27,7 +27,7 @@ int sdl_render_grid(
     int total_generations
 );
 
-void sdl_wait_for_enter(void);
+void sdl_wait_for_enter(const char *message, double elapsed);
 
 void sdl_close_viewer(void);
 

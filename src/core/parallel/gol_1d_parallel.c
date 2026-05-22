@@ -102,6 +102,8 @@ static void run_gol_1d_internal(
 
     MPI_Bcast(&running, 1, MPI_INT, 0, MPI_COMM_WORLD);
 
+    double start_time = MPI_Wtime();
+
     for (int step = 0; step <= steps && running; step++) {
         MPI_Gatherv(
             &current[1],
@@ -172,13 +174,17 @@ static void run_gol_1d_internal(
         memset(next, 0, (size_t)local_n + 2);
     }
 
+    double end_time = MPI_Wtime();
+    double elapsed = end_time - start_time;
+
     if (rank == 0) {
         if (write_pgm(out_path, history, steps + 1, global_n)) {
+            printf("Timp parallel 1D: %.6f secunde\n", elapsed);
             printf("Imagine salvata: %s\n", out_path);
         }
 
         if (use_sdl) {
-            sdl_wait_for_enter();
+            sdl_wait_for_enter("SIMULARE PARALELA FINALIZATA", elapsed);
             sdl_close_viewer();
         }
     }

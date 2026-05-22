@@ -104,7 +104,7 @@ static void run_gol_1d_serial_internal(
     }
 
     if (use_sdl) {
-        sdl_wait_for_enter();
+        sdl_wait_for_enter("SIMULARE SERIALA FINALIZATA", elapsed);
         sdl_close_viewer();
     }
 

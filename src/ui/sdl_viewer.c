@@ -602,8 +602,20 @@ int sdl_render_grid(
     return 1;
 }
 
-void sdl_wait_for_enter(void) {
+void sdl_wait_for_enter(const char *message, double elapsed) {
     int waiting = 1;
+
+    SDL_Color red = {255, 0, 0, 255};
+
+    char text[256];
+
+    snprintf(
+        text,
+        sizeof(text),
+        "%s | Timp: %.6f secunde | ENTER pentru meniu",
+        message,
+        elapsed
+    );
 
     while (waiting) {
         SDL_Event event;
@@ -622,6 +634,15 @@ void sdl_wait_for_enter(void) {
             }
         }
 
+        draw_text_color(
+            text,
+            30,
+            30,
+            font_medium,
+            red
+        );
+
+        SDL_RenderPresent(renderer);
         SDL_Delay(16);
     }
 }
