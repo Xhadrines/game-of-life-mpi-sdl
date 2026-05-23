@@ -88,7 +88,7 @@ make run
 ```bash
 make run8
 ```
-git
+
 #### Rulare cu 12 procese MPI:
 
 ```bash
