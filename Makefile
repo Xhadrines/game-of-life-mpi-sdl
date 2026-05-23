@@ -37,6 +37,12 @@ run: $(TARGET)
 run8: $(TARGET)
 	mpirun -np 8 ./$(TARGET) app
 
+run12: $(TARGET)
+	mpirun --oversubscribe -np 12 ./$(TARGET) app	# Add --oversubscribe flag to allow more processes than available CPU cores
+
+run16: $(TARGET)
+	mpirun --oversubscribe -np 16 ./$(TARGET) app	# Add --oversubscribe flag to allow more processes than available CPU cores
+
 # =========================
 # PARALLEL CONSOLE
 # =========================
