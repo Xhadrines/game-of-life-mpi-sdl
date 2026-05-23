@@ -5,6 +5,7 @@
 
 #include "../include/core/parallel/gol_1d_parallel.h"
 #include "../include/core/parallel/gol_2d_parallel.h"
+#include "../include/core/parallel/gol_2d_parallel_toroidal.h"
 #include "../include/core/serial/gol_1d_serial.h"
 #include "../include/core/serial/gol_2d_serial.h"
 #include "../include/ui/sdl_viewer.h"
@@ -91,6 +92,17 @@ int main(int argc, char **argv) {
                     );
                 }
             }
+
+            else if (mode == 5) {
+                run_gol_2d_parallel_toroidal_visual(
+                    rows,
+                    cols,
+                    steps,
+                    "output/rezultat_2d_parallel_toroidal.pgm",
+                    scale,
+                    delay_ms
+                );
+            }
         }
 
         MPI_Finalize();
@@ -103,6 +115,15 @@ int main(int argc, char **argv) {
 
     else if (strcmp(argv[1], "parallel2d") == 0 && argc == 6) {
         run_gol_2d_parallel(atoi(argv[2]), atoi(argv[3]), atoi(argv[4]), argv[5]);
+    }
+
+    else if (strcmp(argv[1], "parallel2d_toroidal") == 0 && argc == 6) {
+        run_gol_2d_parallel_toroidal(
+            atoi(argv[2]),
+            atoi(argv[3]),
+            atoi(argv[4]),
+            argv[5]
+        );
     }
 
     else if (strcmp(argv[1], "serial1d") == 0 && argc == 5) {

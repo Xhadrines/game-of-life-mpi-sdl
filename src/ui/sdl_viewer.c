@@ -347,6 +347,13 @@ int sdl_app_menu(
                     fix_invalid_value(mpi_size, *mode, rows, cols);
                 }
 
+                else if (key == SDLK_5) {
+                    *mode = 5;
+                    set_defaults_2d(mpi_size, rows, cols, steps, scale, delay_ms);
+                    field = 0;
+                    fix_invalid_value(mpi_size, *mode, rows, cols);
+                }
+
                 else if (key == SDLK_RIGHT) {
                     field++;
                     if (field >= total_fields) field = 0;
@@ -411,7 +418,7 @@ int sdl_app_menu(
         draw_text("Conway Game of Life", 430, 30, font_large);
 
         draw_text("1 = MPI 1D | 3 = SERIAL 1D", button_1d.x + 20, button_1d.y - 35, font_small);
-        draw_text("2 = MPI 2D | 4 = SERIAL 2D", button_2d.x + 20, button_2d.y - 35, font_small);
+        draw_text("2 = MPI 2D | 4 = SERIAL 2D | 5 = TOROIDAL 2D", button_2d.x + 20, button_2d.y - 35, font_small);
 
         if (*mode == 1) {
             draw_button(button_1d, 1, 70, 130, 180, "MPI 1D");
@@ -422,6 +429,9 @@ int sdl_app_menu(
         } else if (*mode == 3) {
             draw_button(button_1d, 1, 70, 130, 180, "SERIAL 1D");
             draw_button(button_2d, 0, 46, 160, 67, "MPI 2D");
+        } else if (*mode == 5) {
+            draw_button(button_1d, 0, 70, 130, 180, "MPI 1D");
+            draw_button(button_2d, 1, 46, 160, 67, "TOROIDAL 2D");
         } else {
             draw_button(button_1d, 0, 70, 130, 180, "MPI 1D");
             draw_button(button_2d, 1, 46, 160, 67, "SERIAL 2D");
@@ -452,7 +462,7 @@ int sdl_app_menu(
             snprintf(
                 info,
                 sizeof(info),
-                "MPI processes: %d | 1=MPI1D | 2=MPI2D | 3=SERIAL1D | 4=SERIAL2D | LEFT/RIGHT=select | UP/DOWN=modify | R=reset | ENTER=run",
+                "MPI processes: %d | 1=MPI1D | 2=MPI2D | 3=SERIAL1D | 4=SERIAL2D | 5=TOROIDAL2D | LEFT/RIGHT=select | UP/DOWN=modify | R=reset | ENTER=run",
                 mpi_size
             );
         } else {

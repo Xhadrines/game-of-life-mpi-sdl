@@ -9,6 +9,7 @@ TARGET=build/gol_mpi
 SRC=src/main.c \
     src/core/parallel/gol_1d_parallel.c \
     src/core/parallel/gol_2d_parallel.c \
+	src/core/parallel/gol_2d_parallel_toroidal.c \
 	src/core/serial/gol_1d_serial.c \
     src/core/serial/gol_2d_serial.c \
     src/utils/utils.c \
@@ -42,6 +43,9 @@ parallel1d: $(TARGET)
 parallel2d: $(TARGET)
 	mpirun -np 4 ./$(TARGET) parallel2d 500 500 1000 output/parallel2d.pgm
 
+parallel2d_toroidal: $(TARGET)
+	mpirun -np 4 ./$(TARGET) parallel2d_toroidal 500 500 1000 output/parallel2d_toroidal.pgm
+
 # =========================
 # SERIAL CONSOLE
 # =========================
@@ -59,6 +63,10 @@ serial2d: $(TARGET)
 benchmark2d_parallel:
 	@echo "Please wait... running MPI 2D benchmark 10000x10000"
 	mpirun -np 8 ./$(TARGET) parallel2d 10000 10000 100 output/benchmark_2d_parallel.pgm
+
+benchmark2d_parallel_toroidal: $(TARGET)
+	@echo "Please wait... running TOROIDAL MPI 2D benchmark 10000x10000"
+	mpirun -np 8 ./$(TARGET) parallel2d_toroidal 10000 10000 100 output/benchmark_2d_toroidal.pgm
 
 benchmark2d_serial:
 	@echo "Please wait... running SERIAL 2D benchmark 10000x10000"

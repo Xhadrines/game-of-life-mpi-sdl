@@ -8,21 +8,25 @@ Implementare paralelă a jocului Conway's Game of Life folosind MPI și SDL2.
 - Mod 1D și 2D
 - Implementare serială pentru 1D și 2D
 - Implementare paralelă pentru 1D și 2D folosind MPI
+- Implementare paralelă 2D cu grilă toroidală / periodică
 - Rulare din terminal pentru variantele seriale și paralele
+- Rulare benchmark pentru grile mari `10000 x 10000`
 - Interfață grafică SDL2
 - Configurare runtime prin meniu interactiv
 - Selectare mod din interfață:
   - MPI 1D
   - MPI 2D
+  - MPI 2D Toroidal
   - Serial 1D
   - Serial 2D
 - Sistem Pause / Resume
 - Oprire simulare cu salvarea ultimei stări
 - Titlu dinamic al ferestrei cu modul curent și generația simulată
-- Export imagine finală (.pgm)
+- Afișare timp de execuție la finalul simulării
+- Export imagine finală `.pgm`
 - Validare automată pentru împărțirea corectă a gridului între procese MPI
 - Control complet din tastatură
-- Creare automată pentru directoarele build/ și output/
+- Creare automată pentru directoarele `build/` și `output/`
 
 ## Tehnologii folosite
 
@@ -107,6 +111,18 @@ make parallel2d
 mpirun -np 4 ./build/gol_mpi parallel2d 500 500 1000 output/parallel2d.pgm
 ```
 
+#### 2D Parallel Toroidal
+
+```bash
+make parallel2d_toroidal
+```
+
+#### Sau manual:
+
+```bash
+mpirun -np 4 ./build/gol_mpi parallel2d_toroidal 500 500 1000 output/parallel2d_toroidal.pgm
+```
+
 ---
 
 ### Rulare Serial Console
@@ -149,6 +165,18 @@ make benchmark2d
 
 ```bash
 mpirun -np 8 ./build/gol_mpi parallel2d 10000 10000 100 output/benchmark_2d_parallel.pgm
+```
+
+#### Parallel 2D Toroidal Benchmark (10000x10000)
+
+```bash
+make benchmark2d_parallel_toroidal
+```
+
+#### Sau manual
+
+```bash
+mpirun -np 8 ./build/gol_mpi parallel2d_toroidal 10000 10000 100 output/benchmark_2d_toroidal.pgm
 ```
 
 #### Serial 2D Benchmark (10000x10000)
