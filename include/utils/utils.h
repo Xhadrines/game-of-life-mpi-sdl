@@ -21,4 +21,18 @@ int write_pgm(
     int cols
 );
 
+int write_ppm(
+    const char *path,
+    const unsigned char *grid,
+    int rows,
+    int cols
+);
+
+int write_output_images(
+    const char *pgm_path,
+    const unsigned char *grid,
+    int rows,
+    int cols
+);
+
 #endif

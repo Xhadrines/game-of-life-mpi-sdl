@@ -135,8 +135,9 @@ static void run_gol_2d_serial_internal(
 
     printf("Timp serial 2D: %.6f secunde\n", elapsed);
 
-    if (write_pgm(out_path, current, rows, cols)) {
-        printf("Imagine salvata: %s\n", out_path);
+    if (write_output_images(out_path, current, rows, cols)) {
+        printf("Imagine PGM salvata: output/pgm/%s.pgm\n", out_path);
+        printf("Imagine PPM salvata: output/ppm/%s.ppm\n", out_path);
     }
 
     if (use_sdl) {

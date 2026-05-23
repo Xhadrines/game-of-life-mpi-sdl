@@ -178,9 +178,10 @@ static void run_gol_1d_internal(
     double elapsed = end_time - start_time;
 
     if (rank == 0) {
-        if (write_pgm(out_path, history, steps + 1, global_n)) {
+        if (write_output_images(out_path, history, steps + 1, global_n)) {
             printf("Timp parallel 1D: %.6f secunde\n", elapsed);
-            printf("Imagine salvata: %s\n", out_path);
+            printf("Imagine PGM salvata: output/pgm/%s.pgm\n", out_path);
+            printf("Imagine PPM salvata: output/ppm/%s.ppm\n", out_path);
         }
 
         if (use_sdl) {

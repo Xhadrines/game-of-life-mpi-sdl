@@ -99,8 +99,9 @@ static void run_gol_1d_serial_internal(
 
     printf("Timp serial 1D: %.6f secunde\n", elapsed);
 
-    if (write_pgm(out_path, history, steps + 1, global_n)) {
-        printf("Imagine salvata: %s\n", out_path);
+    if (write_output_images(out_path, history, steps + 1, global_n)) {
+        printf("Imagine PGM salvata: output/pgm/%s.pgm\n", out_path);
+        printf("Imagine PPM salvata: output/ppm/%s.ppm\n", out_path);
     }
 
     if (use_sdl) {

@@ -1,2 +1,3 @@
-output/*.pgm
+output/pgm/*.pgm
+output/ppm/*.ppm
 build/*

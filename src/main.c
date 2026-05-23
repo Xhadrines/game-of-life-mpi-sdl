@@ -53,7 +53,7 @@ int main(int argc, char **argv) {
                 run_gol_1d_parallel_visual(
                     rows,
                     steps,
-                    "output/rezultat_1d_parallel.pgm",
+                    "rezultat_1d_parallel",
                     scale,
                     delay_ms
                 );
@@ -64,7 +64,7 @@ int main(int argc, char **argv) {
                     rows,
                     cols,
                     steps,
-                    "output/rezultat_2d_parallel.pgm",
+                    "rezultat_2d_parallel",
                     scale,
                     delay_ms,
                     pattern_type
@@ -76,7 +76,7 @@ int main(int argc, char **argv) {
                     run_gol_1d_serial_visual(
                         rows,
                         steps,
-                        "output/rezultat_1d_serial.pgm",
+                        "rezultat_1d_serial",
                         scale,
                         delay_ms
                     );
@@ -89,7 +89,7 @@ int main(int argc, char **argv) {
                         rows,
                         cols,
                         steps,
-                        "output/rezultat_2d_serial.pgm",
+                        "rezultat_2d_serial",
                         scale,
                         delay_ms,
                         pattern_type
@@ -102,7 +102,7 @@ int main(int argc, char **argv) {
                     rows,
                     cols,
                     steps,
-                    "output/rezultat_2d_parallel_toroidal.pgm",
+                    "rezultat_2d_parallel_toroidal",
                     scale,
                     delay_ms,
                     pattern_type

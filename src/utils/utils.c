@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 #include "../include/utils/utils.h"
 
@@ -40,4 +41,59 @@ int write_pgm(const char *path, const unsigned char *grid, int rows, int cols) {
 
     fclose(f);
     return 1;
+}
+
+int write_ppm(const char *path, const unsigned char *grid, int rows, int cols) {
+    FILE *f = fopen(path, "w");
+
+    if (!f) {
+        perror("fopen");
+        return 0;
+    }
+
+    fprintf(f, "P3\n%d %d\n255\n", cols, rows);
+
+    for (int r = 0; r < rows; r++) {
+        for (int c = 0; c < cols; c++) {
+            if (grid[r * cols + c]) {
+                fprintf(f, "255 255 255 ");
+            } else {
+                fprintf(f, "0 0 0 ");
+            }
+        }
+
+        fprintf(f, "\n");
+    }
+
+    fclose(f);
+    return 1;
+}
+
+int write_output_images(
+    const char *base_name,
+    const unsigned char *grid,
+    int rows,
+    int cols
+) {
+    char pgm_full[512];
+    char ppm_full[512];
+
+    snprintf(
+        pgm_full,
+        sizeof(pgm_full),
+        "output/pgm/%s.pgm",
+        base_name
+    );
+
+    snprintf(
+        ppm_full,
+        sizeof(ppm_full),
+        "output/ppm/%s.ppm",
+        base_name
+    );
+
+    int ok_pgm = write_pgm(pgm_full, grid, rows, cols);
+    int ok_ppm = write_ppm(ppm_full, grid, rows, cols);
+
+    return ok_pgm && ok_ppm;
 }

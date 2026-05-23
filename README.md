@@ -29,7 +29,7 @@ Implementare paralelă a jocului Conway's Game of Life folosind MPI și SDL2.
 - Oprire simulare cu salvarea ultimei stări
 - Titlu dinamic al ferestrei cu modul curent și generația simulată
 - Afișare timp de execuție la finalul simulării
-- Export imagine finală `.pgm`
+- Export imagine finală `.pgm` și `.ppm`
 - Validare automată pentru împărțirea corectă a gridului între procese MPI
 - Control complet din tastatură
 - Creare automată pentru directoarele `build/` și `output/`
@@ -108,7 +108,7 @@ make parallel1d
 #### Sau manual:
 
 ```bash
-mpirun -np 4 ./build/gol_mpi parallel1d 1000 500 output/parallel1d.pgm
+mpirun -np 4 ./build/gol_mpi parallel1d 1000 500 parallel1d
 ```
 
 #### 2D Parallel
@@ -120,7 +120,7 @@ make parallel2d
 #### Sau manual:
 
 ```bash
-mpirun -np 4 ./build/gol_mpi parallel2d 500 500 1000 output/parallel2d.pgm 0
+mpirun -np 4 ./build/gol_mpi parallel2d 500 500 1000 parallel2d 0
 ```
 
 #### 2D Parallel Toroidal
@@ -132,7 +132,7 @@ make parallel2d_toroidal
 #### Sau manual:
 
 ```bash
-mpirun -np 4 ./build/gol_mpi parallel2d_toroidal 500 500 1000 output/parallel2d_toroidal.pgm 0
+mpirun -np 4 ./build/gol_mpi parallel2d_toroidal 500 500 1000 parallel2d_toroidal 0
 ```
 
 ---
@@ -148,7 +148,7 @@ make serial1d
 #### Sau manual:
 
 ```bash
-./build/gol_mpi serial1d 1000 500 output/serial1d.pgm
+./build/gol_mpi serial1d 1000 500 serial1d
 ```
 
 #### 2D Serial
@@ -160,7 +160,7 @@ make serial2d
 #### Sau manual:
 
 ```bash
-./build/gol_mpi serial2d 500 500 1000 output/serial2d.pgm 0
+./build/gol_mpi serial2d 500 500 1000 serial2d 0
 ```
 
 ---
@@ -176,7 +176,7 @@ make benchmark2d_parallel
 #### Sau manual
 
 ```bash
-mpirun -np 8 ./build/gol_mpi parallel2d 10000 10000 100 output/benchmark_2d_parallel.pgm 0
+mpirun -np 8 ./build/gol_mpi parallel2d 10000 10000 100 benchmark_2d_parallel 0
 ```
 
 #### Parallel 2D Toroidal Benchmark (10000x10000)
@@ -188,7 +188,7 @@ make benchmark2d_parallel_toroidal
 #### Sau manual
 
 ```bash
-mpirun -np 8 ./build/gol_mpi parallel2d_toroidal 10000 10000 100 output/benchmark_2d_toroidal.pgm 0
+mpirun -np 8 ./build/gol_mpi parallel2d_toroidal 10000 10000 100 benchmark_2d_toroidal 0
 ```
 
 #### Serial 2D Benchmark (10000x10000)
@@ -200,7 +200,7 @@ make benchmark2d_serial
 #### Sau manual
 
 ```bash
-./build/gol_mpi serial2d 10000 10000 100 output/benchmark_2d_serial.pgm 0
+./build/gol_mpi serial2d 10000 10000 100 benchmark_2d_serial 0
 ```
 
 ## Structura proiectului
@@ -233,6 +233,8 @@ game-of-life-mpi-sdl/
 │       └── utils.h
 │
 ├── output/
+│   ├── pgm/
+│   └── ppm/
 │
 ├── src/
 │   ├── core/
@@ -298,7 +300,10 @@ output/
 Exemplu:
 
 ```
-output/rezultat_2d_parallel.pgm
-output/rezultat_2d_parallel_toroidal.pgm
-output/rezultat_2d_serial.pgm
+output/pgm/rezultat_2d_parallel.pgm
+output/ppm/rezultat_2d_parallel.ppm
+output/pgm/rezultat_2d_parallel_toroidal.pgm
+output/ppm/rezultat_2d_parallel_toroidal.ppm
+output/pgm/rezultat_2d_serial.pgm
+output/ppm/rezultat_2d_serial.ppm
 ```
