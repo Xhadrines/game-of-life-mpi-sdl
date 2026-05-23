@@ -19,6 +19,12 @@ Implementare paralelă a jocului Conway's Game of Life folosind MPI și SDL2.
   - MPI 2D Toroidal
   - Serial 1D
   - Serial 2D
+- Pattern-uri clasice Conway pentru simulările 2D:
+  - random
+  - glider
+  - blinker
+- Selectare pattern din interfața SDL2 și terminal pentru modurile 2D
+- Modificare rapidă valori cu `SHIFT + UP / DOWN`
 - Sistem Pause / Resume
 - Oprire simulare cu salvarea ultimei stări
 - Titlu dinamic al ferestrei cu modul curent și generația simulată
@@ -46,7 +52,7 @@ git clone https://github.com/Xhadrines/game-of-life-mpi-sdl.git
 2. Intră în directorul proiectului
 
 ```bash
-cd conway-game-of-life-mpi
+cd game-of-life-mpi-sdl
 ```
 
 3. Instalează dependențele (Arch Linux)
@@ -62,6 +68,12 @@ make
 ```
 
 ## Rulare
+
+> Pattern-uri disponibile pentru modurile 2D:
+>
+> - `0` = random
+> - `1` = glider
+> - `2` = blinker
 
 ### Interfață SDL2
 
@@ -108,7 +120,7 @@ make parallel2d
 #### Sau manual:
 
 ```bash
-mpirun -np 4 ./build/gol_mpi parallel2d 500 500 1000 output/parallel2d.pgm
+mpirun -np 4 ./build/gol_mpi parallel2d 500 500 1000 output/parallel2d.pgm 0
 ```
 
 #### 2D Parallel Toroidal
@@ -120,7 +132,7 @@ make parallel2d_toroidal
 #### Sau manual:
 
 ```bash
-mpirun -np 4 ./build/gol_mpi parallel2d_toroidal 500 500 1000 output/parallel2d_toroidal.pgm
+mpirun -np 4 ./build/gol_mpi parallel2d_toroidal 500 500 1000 output/parallel2d_toroidal.pgm 0
 ```
 
 ---
@@ -148,7 +160,7 @@ make serial2d
 #### Sau manual:
 
 ```bash
-./build/gol_mpi serial2d 500 500 1000 output/serial2d.pgm
+./build/gol_mpi serial2d 500 500 1000 output/serial2d.pgm 0
 ```
 
 ---
@@ -158,13 +170,13 @@ make serial2d
 #### Parallel 2D Benchmark (10000x10000)
 
 ```bash
-make benchmark2d
+make benchmark2d_parallel
 ```
 
 #### Sau manual
 
 ```bash
-mpirun -np 8 ./build/gol_mpi parallel2d 10000 10000 100 output/benchmark_2d_parallel.pgm
+mpirun -np 8 ./build/gol_mpi parallel2d 10000 10000 100 output/benchmark_2d_parallel.pgm 0
 ```
 
 #### Parallel 2D Toroidal Benchmark (10000x10000)
@@ -176,7 +188,7 @@ make benchmark2d_parallel_toroidal
 #### Sau manual
 
 ```bash
-mpirun -np 8 ./build/gol_mpi parallel2d_toroidal 10000 10000 100 output/benchmark_2d_toroidal.pgm
+mpirun -np 8 ./build/gol_mpi parallel2d_toroidal 10000 10000 100 output/benchmark_2d_toroidal.pgm 0
 ```
 
 #### Serial 2D Benchmark (10000x10000)
@@ -188,13 +200,13 @@ make benchmark2d_serial
 #### Sau manual
 
 ```bash
-./build/gol_mpi serial2d 10000 10000 100 output/benchmark_2d_serial.pgm
+./build/gol_mpi serial2d 10000 10000 100 output/benchmark_2d_serial.pgm 0
 ```
 
 ## Structura proiectului
 
 ```text
-game_of_life/
+game-of-life-mpi-sdl/
 │
 ├── assets/
 │   └── fonts/
@@ -206,7 +218,8 @@ game_of_life/
 │   ├── core/
 │   │   ├── parallel/
 │   │   │   ├── gol_1d_parallel.h
-│   │   │   └── gol_2d_parallel.h
+│   │   │   ├── gol_2d_parallel.h
+│   │   │   └── gol_2d_parallel_toroidal.h
 │   │   │
 │   │   └── serial/
 │   │       ├── gol_1d_serial.h
@@ -216,6 +229,7 @@ game_of_life/
 │   │   └── sdl_viewer.h
 │   │
 │   └── utils/
+│       ├── patterns.h
 │       └── utils.h
 │
 ├── output/
@@ -224,7 +238,8 @@ game_of_life/
 │   ├── core/
 │   │   ├── parallel/
 │   │   │   ├── gol_1d_parallel.c
-│   │   │   └── gol_2d_parallel.c
+│   │   │   ├── gol_2d_parallel.c
+│   │   │   └── gol_2d_parallel_toroidal.c
 │   │   │
 │   │   └── serial/
 │   │       ├── gol_1d_serial.c
@@ -234,6 +249,7 @@ game_of_life/
 │   │   └── sdl_viewer.c
 │   │
 │   ├── utils/
+│   │   ├── patterns.c
 │   │   └── utils.c
 │   │
 │   └── main.c
@@ -248,18 +264,20 @@ game_of_life/
 
 ### Meniu principal
 
-| Tastă        | Acțiune                    |
-| ------------ | -------------------------- |
-| 1            | Selectare mod MPI 1D       |
-| 2            | Selectare mod MPI 2D       |
-| 3            | Selectare mod Serial 1D    |
-| 4            | Selectare mod Serial 2D    |
-| LEFT / RIGHT | Schimbare câmp selectat    |
-| UP / DOWN    | Creștere / scădere valori  |
-| ENTER        | Pornire simulare           |
-| SPACE        | Pause / Resume în simulare |
-| R            | Reset valori implicite     |
-| ESC          | Ieșire / oprire simulare   |
+| Tastă             | Acțiune                                        |
+| ----------------- | ---------------------------------------------- |
+| 1                 | Selectare mod MPI 1D                           |
+| 2                 | Selectare mod MPI 2D                           |
+| 3                 | Selectare mod Serial 1D                        |
+| 4                 | Selectare mod Serial 2D                        |
+| 5                 | Selectare mod MPI 2D Toroidal                  |
+| LEFT / RIGHT      | Schimbare câmp selectat                        |
+| UP / DOWN         | Creștere / scădere valori câmp selectat        |
+| SHIFT + UP / DOWN | Creștere / scădere rapidă valori câmp selectat |
+| ENTER             | Pornire simulare                               |
+| SPACE             | Pause / Resume în simulare                     |
+| R                 | Reset valori implicite                         |
+| ESC               | Ieșire / oprire simulare                       |
 
 ### În timpul simulării
 
@@ -280,5 +298,7 @@ output/
 Exemplu:
 
 ```
-output/rezultat_2d_sdl.pgm
+output/rezultat_2d_parallel.pgm
+output/rezultat_2d_parallel_toroidal.pgm
+output/rezultat_2d_serial.pgm
 ```

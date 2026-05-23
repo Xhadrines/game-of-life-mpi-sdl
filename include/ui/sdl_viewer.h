@@ -8,7 +8,8 @@ int sdl_app_menu(
     int *cols,
     int *steps,
     int *scale,
-    int *delay_ms
+    int *delay_ms,
+    int *pattern_type
 );
 
 int sdl_init_viewer(

@@ -5,6 +5,7 @@
 #include <time.h>
 
 #include "../include/utils/utils.h"
+#include "../include/utils/patterns.h"
 #include "../include/ui/sdl_viewer.h"
 #include "../include/core/parallel/gol_2d_parallel_toroidal.h"
 
@@ -82,7 +83,8 @@ static void run_gol_2d_toroidal_internal(
     const char *out_path,
     int use_sdl,
     int scale,
-    int delay_ms
+    int delay_ms,
+    int pattern_type
 ) {
     int rank, size;
 
@@ -106,7 +108,7 @@ static void run_gol_2d_toroidal_internal(
             MPI_Abort(MPI_COMM_WORLD, 1);
         }
 
-        random_fill(global, rows, cols, 0.30, (unsigned int)time(NULL));
+        apply_pattern(global, rows, cols, pattern_type, (unsigned int)time(NULL));
 
         for (int p = 0; p < size; p++) {
             int lr = owner_rows(rows, size, p);
@@ -259,9 +261,10 @@ void run_gol_2d_parallel_toroidal(
     int rows,
     int cols,
     int steps,
-    const char *out_path
+    const char *out_path,
+    int pattern_type
 ) {
-    run_gol_2d_toroidal_internal(rows, cols, steps, out_path, 0, 1, 0);
+    run_gol_2d_toroidal_internal(rows, cols, steps, out_path, 0, 1, 0, pattern_type);
 }
 
 void run_gol_2d_parallel_toroidal_visual(
@@ -270,7 +273,8 @@ void run_gol_2d_parallel_toroidal_visual(
     int steps,
     const char *out_path,
     int scale,
-    int delay_ms
+    int delay_ms,
+    int pattern_type
 ) {
     if (scale <= 0) {
         scale = 4;
@@ -280,5 +284,5 @@ void run_gol_2d_parallel_toroidal_visual(
         delay_ms = 20;
     }
 
-    run_gol_2d_toroidal_internal(rows, cols, steps, out_path, 1, scale, delay_ms);
+    run_gol_2d_toroidal_internal(rows, cols, steps, out_path, 1, scale, delay_ms, pattern_type);
 }

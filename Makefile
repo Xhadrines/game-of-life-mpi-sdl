@@ -13,6 +13,7 @@ SRC=src/main.c \
 	src/core/serial/gol_1d_serial.c \
     src/core/serial/gol_2d_serial.c \
     src/utils/utils.c \
+	src/utils/patterns.c \
     src/ui/sdl_viewer.c
 
 all: $(TARGET)
@@ -41,10 +42,10 @@ parallel1d: $(TARGET)
 	mpirun -np 4 ./$(TARGET) parallel1d 1000 500 output/parallel1d.pgm
 
 parallel2d: $(TARGET)
-	mpirun -np 4 ./$(TARGET) parallel2d 500 500 1000 output/parallel2d.pgm
+	mpirun -np 4 ./$(TARGET) parallel2d 500 500 1000 output/parallel2d.pgm 0
 
 parallel2d_toroidal: $(TARGET)
-	mpirun -np 4 ./$(TARGET) parallel2d_toroidal 500 500 1000 output/parallel2d_toroidal.pgm
+	mpirun -np 4 ./$(TARGET) parallel2d_toroidal 500 500 1000 output/parallel2d_toroidal.pgm 0
 
 # =========================
 # SERIAL CONSOLE
@@ -54,23 +55,23 @@ serial1d: $(TARGET)
 	./$(TARGET) serial1d 1000 500 output/serial1d.pgm
 
 serial2d: $(TARGET)
-	./$(TARGET) serial2d 500 500 1000 output/serial2d.pgm
+	./$(TARGET) serial2d 500 500 1000 output/serial2d.pgm 0
 
 # =========================
 # HPC BENCHMARKS
 # =========================
 
-benchmark2d_parallel:
+benchmark2d_parallel: $(TARGET)
 	@echo "Please wait... running MPI 2D benchmark 10000x10000"
-	mpirun -np 8 ./$(TARGET) parallel2d 10000 10000 100 output/benchmark_2d_parallel.pgm
+	mpirun -np 8 ./$(TARGET) parallel2d 10000 10000 100 output/benchmark_2d_parallel.pgm 0
 
 benchmark2d_parallel_toroidal: $(TARGET)
 	@echo "Please wait... running TOROIDAL MPI 2D benchmark 10000x10000"
-	mpirun -np 8 ./$(TARGET) parallel2d_toroidal 10000 10000 100 output/benchmark_2d_toroidal.pgm
+	mpirun -np 8 ./$(TARGET) parallel2d_toroidal 10000 10000 100 output/benchmark_2d_toroidal.pgm 0
 
-benchmark2d_serial:
+benchmark2d_serial: $(TARGET)
 	@echo "Please wait... running SERIAL 2D benchmark 10000x10000"
-	./$(TARGET) serial2d 10000 10000 100 output/benchmark_2d_serial.pgm
+	./$(TARGET) serial2d 10000 10000 100 output/benchmark_2d_serial.pgm 0
 
 # =========================
 # CLEAN

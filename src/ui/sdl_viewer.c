@@ -5,6 +5,7 @@
 #include <string.h>
 
 #include "../include/ui/sdl_viewer.h"
+#include "../include/utils/patterns.h"
 
 static SDL_Window *window = NULL;
 static SDL_Renderer *renderer = NULL;
@@ -58,9 +59,9 @@ static int init_window(const char *title, int width, int height) {
         return 0;
     }
 
-    font_small = load_font(16);
-    font_medium = load_font(22);
-    font_large = load_font(34);
+    font_small = load_font(24);
+    font_medium = load_font(32);
+    font_large = load_font(54);
 
     if (!font_small || !font_medium || !font_large) {
         fprintf(stderr, "Nu am gasit font. Verifica assets/fonts/DejaVuSans.ttf\n");
@@ -210,6 +211,22 @@ static void draw_field(SDL_Rect rect, int active, const char *name, int value) {
     draw_text(buffer, rect.x + 20, rect.y + 50, font_medium);
 }
 
+static void draw_field_text(SDL_Rect rect, int active, const char *name, const char *value) {
+    if (active) {
+        SDL_SetRenderDrawColor(renderer, 70, 130, 180, 255);
+    } else {
+        SDL_SetRenderDrawColor(renderer, 70, 70, 70, 255);
+    }
+
+    SDL_RenderFillRect(renderer, &rect);
+
+    SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
+    SDL_RenderDrawRect(renderer, &rect);
+
+    draw_text(name, rect.x + 20, rect.y + 12, font_small);
+    draw_text(value, rect.x + 20, rect.y + 50, font_medium);
+}
+
 static void set_defaults_1d(int mpi_size, int *rows, int *cols, int *steps, int *scale, int *delay_ms) {
     *rows = 500 * mpi_size;
     *cols = 1;
@@ -233,24 +250,29 @@ int sdl_app_menu(
     int *cols,
     int *steps,
     int *scale,
-    int *delay_ms
+    int *delay_ms,
+    int *pattern_type
 ) {
-    if (!init_window("Game of Life MPI", 1366, 768)) {
+    if (!init_window("Game of Life MPI", 1920, 1080)) {
         return 0;
     }
 
     *mode = 2;
 
-    SDL_Rect button_1d = {170, 110, 420, 110};
-    SDL_Rect button_2d = {770, 110, 420, 110};
+    SDL_Rect button_mpi_1d = {120, 170, 300, 100};
+    SDL_Rect button_mpi_2d = {450, 170, 300, 100};
+    SDL_Rect button_serial_1d = {780, 170, 300, 100};
+    SDL_Rect button_serial_2d = {1110, 170, 300, 100};
+    SDL_Rect button_toroidal = {1440, 170, 360, 100};
 
-    SDL_Rect field_1 = {120, 320, 180, 110};
-    SDL_Rect field_2 = {340, 320, 180, 110};
-    SDL_Rect field_3 = {560, 320, 180, 110};
-    SDL_Rect field_4 = {780, 320, 180, 110};
-    SDL_Rect field_5 = {1000, 320, 180, 110};
+    SDL_Rect field_1 = {120, 360, 250, 110};
+    SDL_Rect field_2 = {410, 360, 250, 110};
+    SDL_Rect field_3 = {700, 360, 250, 110};
+    SDL_Rect field_4 = {990, 360, 250, 110};
+    SDL_Rect field_5 = {1280, 360, 250, 110};
+    SDL_Rect field_6 = {1570, 360, 250, 110};
 
-    SDL_Rect run_button = {460, 560, 440, 100};
+    SDL_Rect run_button = {690, 650, 540, 110};
 
     int field = 0;
     int running = 1;
@@ -259,7 +281,7 @@ int sdl_app_menu(
     fix_invalid_value(mpi_size, *mode, rows, cols);
 
     while (running) {
-        int total_fields = is_1d_mode(*mode) ? 4 : 5;
+        int total_fields = is_1d_mode(*mode) ? 4 : 6;
         int valid = is_valid_config(mpi_size, *mode, *rows, *cols);
 
         if (field >= total_fields) {
@@ -277,15 +299,36 @@ int sdl_app_menu(
                 int x = event.button.x;
                 int y = event.button.y;
 
-                if (inside(button_1d, x, y)) {
+                if (inside(button_mpi_1d, x, y)) {
                     *mode = 1;
                     set_defaults_1d(mpi_size, rows, cols, steps, scale, delay_ms);
                     field = 0;
                     fix_invalid_value(mpi_size, *mode, rows, cols);
                 }
 
-                if (inside(button_2d, x, y)) {
+                if (inside(button_mpi_2d, x, y)) {
                     *mode = 2;
+                    set_defaults_2d(mpi_size, rows, cols, steps, scale, delay_ms);
+                    field = 0;
+                    fix_invalid_value(mpi_size, *mode, rows, cols);
+                }
+
+                if (inside(button_serial_1d, x, y)) {
+                    *mode = 3;
+                    set_defaults_1d(mpi_size, rows, cols, steps, scale, delay_ms);
+                    field = 0;
+                    fix_invalid_value(mpi_size, *mode, rows, cols);
+                }
+
+                if (inside(button_serial_2d, x, y)) {
+                    *mode = 4;
+                    set_defaults_2d(mpi_size, rows, cols, steps, scale, delay_ms);
+                    field = 0;
+                    fix_invalid_value(mpi_size, *mode, rows, cols);
+                }
+
+                if (inside(button_toroidal, x, y)) {
+                    *mode = 5;
                     set_defaults_2d(mpi_size, rows, cols, steps, scale, delay_ms);
                     field = 0;
                     fix_invalid_value(mpi_size, *mode, rows, cols);
@@ -296,6 +339,7 @@ int sdl_app_menu(
                 if (inside(field_3, x, y)) field = 2;
                 if (inside(field_4, x, y)) field = 3;
                 if (!is_1d_mode(*mode) && inside(field_5, x, y)) field = 4;
+                if (!is_1d_mode(*mode) && inside(field_6, x, y)) field = 5;
 
                 if (inside(run_button, x, y)) {
                     if (is_valid_config(mpi_size, *mode, *rows, *cols)) {
@@ -307,6 +351,8 @@ int sdl_app_menu(
 
             if (event.type == SDL_KEYDOWN) {
                 SDL_Keycode key = event.key.keysym.sym;
+
+                int fast = (event.key.keysym.mod & KMOD_SHIFT) ? 10 : 1;
 
                 if (key == SDLK_ESCAPE) {
                     running = 0;
@@ -366,16 +412,17 @@ int sdl_app_menu(
 
                 else if (key == SDLK_UP) {
                     if (is_1d_mode(*mode)) {
-                        if (field == 0) *rows += mpi_size;
-                        if (field == 1) *steps += 100;
-                        if (field == 2) *scale += 1;
-                        if (field == 3) *delay_ms += 1;
+                        if (field == 0) *rows += mpi_size * fast;
+                        if (field == 1) *steps += 100 * fast;
+                        if (field == 2) *scale += 1 * fast;
+                        if (field == 3) *delay_ms += 1 * fast;
                     } else {
-                        if (field == 0) *rows += mpi_size;
-                        if (field == 1) *cols += mpi_size;
-                        if (field == 2) *steps += 100;
-                        if (field == 3) *scale += 1;
-                        if (field == 4) *delay_ms += 1;
+                        if (field == 0) *rows += mpi_size * fast;
+                        if (field == 1) *cols += mpi_size * fast;
+                        if (field == 2) *steps += 100 * fast;
+                        if (field == 3) *scale += 1 * fast;
+                        if (field == 4) *delay_ms += 1 * fast;
+                        if (field == 5) *pattern_type = (*pattern_type + 1) % 3;
                     }
 
                     fix_invalid_value(mpi_size, *mode, rows, cols);
@@ -383,19 +430,29 @@ int sdl_app_menu(
 
                 else if (key == SDLK_DOWN) {
                     if (is_1d_mode(*mode)) {
-                        if (field == 0 && *rows > mpi_size) *rows -= mpi_size;
-                        if (field == 1 && *steps > 100) *steps -= 100;
-                        if (field == 2 && *scale > 1) *scale -= 1;
-                        if (field == 3 && *delay_ms > 0) *delay_ms -= 1;
+                        if (field == 0 && *rows > mpi_size) *rows -= mpi_size * fast;
+                        if (field == 1 && *steps > 100) *steps -= 100 * fast;
+                        if (field == 2 && *scale > 1) *scale -= 1 * fast;
+                        if (field == 3 && *delay_ms > 0) *delay_ms -= 1 * fast;
                     } else {
-                        if (field == 0 && *rows > mpi_size) *rows -= mpi_size;
-                        if (field == 1 && *cols > mpi_size) *cols -= mpi_size;
-                        if (field == 2 && *steps > 100) *steps -= 100;
-                        if (field == 3 && *scale > 1) *scale -= 1;
-                        if (field == 4 && *delay_ms > 0) *delay_ms -= 1;
+                        if (field == 0 && *rows > mpi_size) *rows -= mpi_size * fast;
+                        if (field == 1 && *cols > mpi_size) *cols -= mpi_size * fast;
+                        if (field == 2 && *steps > 100) *steps -= 100 * fast;
+                        if (field == 3 && *scale > 1) *scale -= 1 * fast;
+                        if (field == 4 && *delay_ms > 0) *delay_ms -= 1 * fast;
+                        if (field == 5) {
+                            (*pattern_type)--;
+                            if (*pattern_type < 0) *pattern_type = 2;
+                        }
                     }
 
                     fix_invalid_value(mpi_size, *mode, rows, cols);
+
+                    if (*rows < mpi_size) *rows = mpi_size;
+                    if (*cols < mpi_size) *cols = mpi_size;
+                    if (*steps < 100) *steps = 100;
+                    if (*scale < 1) *scale = 1;
+                    if (*delay_ms < 0) *delay_ms = 0;
                 }
 
                 else if (key == SDLK_r) {
@@ -415,27 +472,27 @@ int sdl_app_menu(
         SDL_SetRenderDrawColor(renderer, 25, 25, 25, 255);
         SDL_RenderClear(renderer);
 
-        draw_text("Conway Game of Life", 430, 30, font_large);
+        SDL_Rect title_rect = {0, 20, 1920, 60};
 
-        draw_text("1 = MPI 1D | 3 = SERIAL 1D", button_1d.x + 20, button_1d.y - 35, font_small);
-        draw_text("2 = MPI 2D | 4 = SERIAL 2D | 5 = TOROIDAL 2D", button_2d.x + 20, button_2d.y - 35, font_small);
+        draw_centered_text(
+            "Conway Game of Life",
+            title_rect,
+            font_large
+        );
 
-        if (*mode == 1) {
-            draw_button(button_1d, 1, 70, 130, 180, "MPI 1D");
-            draw_button(button_2d, 0, 46, 160, 67, "MPI 2D");
-        } else if (*mode == 2) {
-            draw_button(button_1d, 0, 70, 130, 180, "MPI 1D");
-            draw_button(button_2d, 1, 46, 160, 67, "MPI 2D");
-        } else if (*mode == 3) {
-            draw_button(button_1d, 1, 70, 130, 180, "SERIAL 1D");
-            draw_button(button_2d, 0, 46, 160, 67, "MPI 2D");
-        } else if (*mode == 5) {
-            draw_button(button_1d, 0, 70, 130, 180, "MPI 1D");
-            draw_button(button_2d, 1, 46, 160, 67, "TOROIDAL 2D");
-        } else {
-            draw_button(button_1d, 0, 70, 130, 180, "MPI 1D");
-            draw_button(button_2d, 1, 46, 160, 67, "SERIAL 2D");
-        }
+        SDL_Rect subtitle_rect = {0, 100, 1920, 40};
+
+        draw_centered_text(
+            "Alege modul folosind tastele 1-5",
+            subtitle_rect,
+            font_small
+        );
+
+        draw_button(button_mpi_1d, *mode == 1, 70, 130, 180, "1 - MPI 1D");
+        draw_button(button_mpi_2d, *mode == 2, 46, 160, 67, "2 - MPI 2D");
+        draw_button(button_serial_1d, *mode == 3, 120, 90, 170, "3 - SERIAL 1D");
+        draw_button(button_serial_2d, *mode == 4, 160, 100, 60, "4 - SERIAL 2D");
+        draw_button(button_toroidal, *mode == 5, 150, 70, 70, "5 - TOROIDAL 2D");
 
         if (is_1d_mode(*mode)) {
             draw_field(field_1, field == 0, "cells", *rows);
@@ -448,6 +505,7 @@ int sdl_app_menu(
             draw_field(field_3, field == 2, "steps", *steps);
             draw_field(field_4, field == 3, "scale", *scale);
             draw_field(field_5, field == 4, "delay", *delay_ms);
+            draw_field_text(field_6, field == 5, "pattern", pattern_name(*pattern_type));
         }
 
         if (valid) {
@@ -474,7 +532,13 @@ int sdl_app_menu(
             );
         }
 
-        draw_text(info, 80, 720, font_small);
+        SDL_Rect info_rect = {0, 940, 1920, 40};
+
+        draw_centered_text(
+            info,
+            info_rect,
+            font_small
+        );
 
         SDL_RenderPresent(renderer);
         SDL_Delay(16);

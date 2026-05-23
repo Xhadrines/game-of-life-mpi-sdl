@@ -29,9 +29,10 @@ int main(int argc, char **argv) {
             int steps = 500 * size;
             int scale = 2;
             int delay_ms = 10;
+            int pattern_type = 0;
 
             if (rank == 0) {
-                if (!sdl_app_menu(size, &mode, &rows, &cols, &steps, &scale, &delay_ms)) {
+                if (!sdl_app_menu(size, &mode, &rows, &cols, &steps, &scale, &delay_ms, &pattern_type)) {
                     mode = 0;
                 }
             }
@@ -42,6 +43,7 @@ int main(int argc, char **argv) {
             MPI_Bcast(&steps, 1, MPI_INT, 0, MPI_COMM_WORLD);
             MPI_Bcast(&scale, 1, MPI_INT, 0, MPI_COMM_WORLD);
             MPI_Bcast(&delay_ms, 1, MPI_INT, 0, MPI_COMM_WORLD);
+            MPI_Bcast(&pattern_type, 1, MPI_INT, 0, MPI_COMM_WORLD);
 
             if (mode == 0) {
                 app_running = 0;
@@ -64,7 +66,8 @@ int main(int argc, char **argv) {
                     steps,
                     "output/rezultat_2d_parallel.pgm",
                     scale,
-                    delay_ms
+                    delay_ms,
+                    pattern_type
                 );
             }
 
@@ -88,7 +91,8 @@ int main(int argc, char **argv) {
                         steps,
                         "output/rezultat_2d_serial.pgm",
                         scale,
-                        delay_ms
+                        delay_ms,
+                        pattern_type
                     );
                 }
             }
@@ -100,7 +104,8 @@ int main(int argc, char **argv) {
                     steps,
                     "output/rezultat_2d_parallel_toroidal.pgm",
                     scale,
-                    delay_ms
+                    delay_ms,
+                    pattern_type
                 );
             }
         }
@@ -113,16 +118,17 @@ int main(int argc, char **argv) {
         run_gol_1d_parallel(atoi(argv[2]), atoi(argv[3]), argv[4]);
     }
 
-    else if (strcmp(argv[1], "parallel2d") == 0 && argc == 6) {
-        run_gol_2d_parallel(atoi(argv[2]), atoi(argv[3]), atoi(argv[4]), argv[5]);
+    else if (strcmp(argv[1], "parallel2d") == 0 && argc == 7) {
+        run_gol_2d_parallel(atoi(argv[2]), atoi(argv[3]), atoi(argv[4]), argv[5], atoi(argv[6]));
     }
 
-    else if (strcmp(argv[1], "parallel2d_toroidal") == 0 && argc == 6) {
+    else if (strcmp(argv[1], "parallel2d_toroidal") == 0 && argc == 7) {
         run_gol_2d_parallel_toroidal(
             atoi(argv[2]),
             atoi(argv[3]),
             atoi(argv[4]),
-            argv[5]
+            argv[5],
+            atoi(argv[6])
         );
     }
 
@@ -134,12 +140,13 @@ int main(int argc, char **argv) {
         );
     }
 
-    else if (strcmp(argv[1], "serial2d") == 0 && argc == 6) {
+    else if (strcmp(argv[1], "serial2d") == 0 && argc == 7) {
         run_gol_2d_serial(
             atoi(argv[2]),
             atoi(argv[3]),
             atoi(argv[4]),
-            argv[5]
+            argv[5],
+            atoi(argv[6])
         );
     }
 

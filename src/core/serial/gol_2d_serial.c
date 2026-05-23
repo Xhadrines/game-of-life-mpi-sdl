@@ -4,6 +4,7 @@
 #include <time.h>
 
 #include "../../../include/utils/utils.h"
+#include "../../../include/utils/patterns.h"
 #include "../../../include/ui/sdl_viewer.h"
 #include "../../../include/core/serial/gol_2d_serial.h"
 
@@ -61,7 +62,8 @@ static void run_gol_2d_serial_internal(
     const char *out_path,
     int use_sdl,
     int scale,
-    int delay_ms
+    int delay_ms,
+    int pattern_type
 ) {
     unsigned char *current = alloc_grid(rows, cols);
     unsigned char *next = alloc_grid(rows, cols);
@@ -75,13 +77,7 @@ static void run_gol_2d_serial_internal(
         return;
     }
 
-    random_fill(
-        current,
-        rows,
-        cols,
-        0.30,
-        (unsigned int)time(NULL)
-    );
+    apply_pattern(current, rows, cols, pattern_type, (unsigned int)time(NULL));
 
     int running = 1;
 
@@ -156,7 +152,8 @@ void run_gol_2d_serial(
     int rows,
     int cols,
     int steps,
-    const char *out_path
+    const char *out_path,
+    int pattern_type
 ) {
     run_gol_2d_serial_internal(
         rows,
@@ -165,7 +162,8 @@ void run_gol_2d_serial(
         out_path,
         0,
         1,
-        0
+        0,
+        pattern_type
     );
 }
 
@@ -175,7 +173,8 @@ void run_gol_2d_serial_visual(
     int steps,
     const char *out_path,
     int scale,
-    int delay_ms
+    int delay_ms,
+    int pattern_type
 ) {
     if (scale <= 0) {
         scale = 2;
@@ -192,6 +191,7 @@ void run_gol_2d_serial_visual(
         out_path,
         1,
         scale,
-        delay_ms
+        delay_ms,
+        pattern_type
     );
 }
