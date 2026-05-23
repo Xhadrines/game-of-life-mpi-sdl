@@ -69,7 +69,36 @@ int write_ppm(const char *path, const unsigned char *grid, int rows, int cols) {
     return 1;
 }
 
-int write_output_images(
+int write_txt(
+    const char *path,
+    const unsigned char *grid,
+    int rows,
+    int cols
+) {
+    FILE *f = fopen(path, "w");
+
+    if (!f) {
+        perror("fopen");
+        return 0;
+    }
+
+    for (int r = 0; r < rows; r++) {
+        for (int c = 0; c < cols; c++) {
+            fprintf(
+                f,
+                "%c ",
+                grid[r * cols + c] ? '#' : '.'
+            );
+        }
+
+        fprintf(f, "\n");
+    }
+
+    fclose(f);
+    return 1;
+}
+
+int write_output_files(
     const char *base_name,
     const unsigned char *grid,
     int rows,
@@ -77,6 +106,7 @@ int write_output_images(
 ) {
     char pgm_full[512];
     char ppm_full[512];
+    char txt_full[512];
 
     snprintf(
         pgm_full,
@@ -92,8 +122,29 @@ int write_output_images(
         base_name
     );
 
+    snprintf(
+        txt_full,
+        sizeof(txt_full),
+        "output/txt/%s.txt",
+        base_name
+    );
+
     int ok_pgm = write_pgm(pgm_full, grid, rows, cols);
     int ok_ppm = write_ppm(ppm_full, grid, rows, cols);
 
-    return ok_pgm && ok_ppm;
+    int ok_txt = 1;
+
+    if (
+        rows <= TXT_EXPORT_MAX_ROWS &&
+        cols <= TXT_EXPORT_MAX_COLS
+    ) {
+        ok_txt = write_txt(
+            txt_full,
+            grid,
+            rows,
+            cols
+        );
+    }
+
+    return ok_pgm && ok_ppm && ok_txt;
 }

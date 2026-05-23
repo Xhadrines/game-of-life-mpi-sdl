@@ -135,9 +135,13 @@ static void run_gol_2d_serial_internal(
 
     printf("Timp serial 2D: %.6f secunde\n", elapsed);
 
-    if (write_output_images(out_path, current, rows, cols)) {
+    if (write_output_files(out_path, current, rows, cols)) {
         printf("Imagine PGM salvata: output/pgm/%s.pgm\n", out_path);
         printf("Imagine PPM salvata: output/ppm/%s.ppm\n", out_path);
+
+        if (rows <= TXT_EXPORT_MAX_ROWS && cols <= TXT_EXPORT_MAX_COLS) {
+            printf("Fisier TXT salvat: output/txt/%s.txt\n", out_path);
+        }
     }
 
     if (use_sdl) {

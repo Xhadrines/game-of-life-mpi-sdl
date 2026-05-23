@@ -222,10 +222,14 @@ static void run_gol_2d_internal(
     double elapsed = end_time - start_time;
 
     if (rank == 0) {
-        if (write_output_images(out_path, global, rows, cols)) {
+        if (write_output_files(out_path, global, rows, cols)) {
             printf("Timp parallel 2D: %.6f secunde\n", elapsed);
             printf("Imagine PGM salvata: output/pgm/%s.pgm\n", out_path);
             printf("Imagine PPM salvata: output/ppm/%s.ppm\n", out_path);
+
+            if (rows <= TXT_EXPORT_MAX_ROWS && cols <= TXT_EXPORT_MAX_COLS) {
+                printf("Fisier TXT salvat: output/txt/%s.txt\n", out_path);
+            }
         }
 
         if (use_sdl) {

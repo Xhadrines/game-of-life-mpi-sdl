@@ -1,3 +1,4 @@
 output/pgm/*.pgm
 output/ppm/*.ppm
+output/txt/*.txt
 build/*

@@ -1,6 +1,9 @@
 #ifndef UTILS_H
 #define UTILS_H
 
+#define TXT_EXPORT_MAX_ROWS 500
+#define TXT_EXPORT_MAX_COLS 500
+
 unsigned char *alloc_grid(
     int rows,
     int cols
@@ -28,8 +31,15 @@ int write_ppm(
     int cols
 );
 
-int write_output_images(
-    const char *pgm_path,
+int write_txt(
+    const char *path,
+    const unsigned char *grid,
+    int rows,
+    int cols
+);
+
+int write_output_files(
+    const char *base_name,
     const unsigned char *grid,
     int rows,
     int cols

@@ -5,6 +5,7 @@
 #include <string.h>
 
 #include "../include/ui/sdl_viewer.h"
+#include "../include/utils/utils.h"
 #include "../include/utils/patterns.h"
 
 static SDL_Window *window = NULL;
@@ -537,6 +538,38 @@ int sdl_app_menu(
         draw_centered_text(
             info,
             info_rect,
+            font_small
+        );
+
+        char txt_info[256];
+
+        if (is_1d_mode(*mode)) {
+            snprintf(
+                txt_info,
+                sizeof(txt_info),
+                "TXT export: steps %d/%d | cells %d/%d | In 1D, generatiile devin randuri",
+                *steps + 1,
+                TXT_EXPORT_MAX_ROWS,
+                *rows,
+                TXT_EXPORT_MAX_COLS
+            );
+        } else {
+            snprintf(
+                txt_info,
+                sizeof(txt_info),
+                "TXT export: rows %d/%d | cols %d/%d",
+                *rows,
+                TXT_EXPORT_MAX_ROWS,
+                *cols,
+                TXT_EXPORT_MAX_COLS
+            );
+        }
+
+        SDL_Rect txt_info_rect = {0, 990, 1920, 40};
+
+        draw_centered_text(
+            txt_info,
+            txt_info_rect,
             font_small
         );
 

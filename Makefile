@@ -23,6 +23,7 @@ $(TARGET): $(SRC)
 	mkdir -p output
 	mkdir -p output/pgm
 	mkdir -p output/ppm
+	mkdir -p output/txt
 
 	$(CC) $(CFLAGS) $(SRC) -o $(TARGET) $(LDFLAGS)
 
@@ -80,4 +81,4 @@ benchmark2d_serial: $(TARGET)
 # =========================
 
 clean:
-	rm -f build/* output/pgm/*.pgm output/ppm/*.ppm
+	rm -f build/* output/pgm/*.pgm output/ppm/*.ppm output/txt/*.txt

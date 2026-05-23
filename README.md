@@ -29,10 +29,10 @@ Implementare paralelă a jocului Conway's Game of Life folosind MPI și SDL2.
 - Oprire simulare cu salvarea ultimei stări
 - Titlu dinamic al ferestrei cu modul curent și generația simulată
 - Afișare timp de execuție la finalul simulării
-- Export imagine finală `.pgm` și `.ppm`
+- Export automat pentru fișiere `.pgm`, `.ppm` și `.txt` (`.txt` doar pentru grile mici)
 - Validare automată pentru împărțirea corectă a gridului între procese MPI
 - Control complet din tastatură
-- Creare automată pentru directoarele `build/` și `output/`
+- Creare automată pentru directoarele `build/`, `output/pgm/`, `output/ppm/` și `output/txt/`
 
 ## Tehnologii folosite
 
@@ -234,7 +234,8 @@ game-of-life-mpi-sdl/
 │
 ├── output/
 │   ├── pgm/
-│   └── ppm/
+│   ├── ppm/
+│   └── txt/
 │
 ├── src/
 │   ├── core/
@@ -291,7 +292,7 @@ game-of-life-mpi-sdl/
 
 ## Output
 
-Imaginile generate sunt salvate automat în:
+Fișierele generate sunt salvate automat în:
 
 ```
 output/
@@ -302,8 +303,5 @@ Exemplu:
 ```
 output/pgm/rezultat_2d_parallel.pgm
 output/ppm/rezultat_2d_parallel.ppm
-output/pgm/rezultat_2d_parallel_toroidal.pgm
-output/ppm/rezultat_2d_parallel_toroidal.ppm
-output/pgm/rezultat_2d_serial.pgm
-output/ppm/rezultat_2d_serial.ppm
+output/txt/rezultat_2d_parallel.txt
 ```

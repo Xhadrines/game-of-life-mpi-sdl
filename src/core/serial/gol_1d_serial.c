@@ -99,9 +99,13 @@ static void run_gol_1d_serial_internal(
 
     printf("Timp serial 1D: %.6f secunde\n", elapsed);
 
-    if (write_output_images(out_path, history, steps + 1, global_n)) {
+    if (write_output_files(out_path, history, steps + 1, global_n)) {
         printf("Imagine PGM salvata: output/pgm/%s.pgm\n", out_path);
         printf("Imagine PPM salvata: output/ppm/%s.ppm\n", out_path);
+
+        if ((steps + 1) <= TXT_EXPORT_MAX_ROWS && global_n <= TXT_EXPORT_MAX_COLS) {
+            printf("Fisier TXT salvat: output/txt/%s.txt\n", out_path);
+        }
     }
 
     if (use_sdl) {
