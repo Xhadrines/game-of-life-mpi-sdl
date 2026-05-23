@@ -8,9 +8,14 @@ Implementare paralelă a jocului Conway's Game of Life folosind MPI și SDL2.
 - Mod 1D și 2D
 - Implementare serială pentru 1D și 2D
 - Implementare paralelă pentru 1D și 2D folosind MPI
+- Descompunere domeniu prin stripes / 1D decomposition
+- Halo exchange cu ghost cells între procese MPI
+- Comunicații non-blocking folosind `MPI_Isend`, `MPI_Irecv` și `MPI_Waitall`
+- Evitare deadlock prin recepții non-blocking, trimiteri non-blocking și sincronizare cu `MPI_Waitall`
 - Implementare paralelă 2D cu grilă toroidală / periodică
 - Rulare din terminal pentru variantele seriale și paralele
 - Rulare benchmark pentru grile mari `10000 x 10000`
+- Rulare locală cu 4, 8, 12 și 16 procese MPI
 - Interfață grafică SDL2
 - Configurare runtime prin meniu interactiv
 - Selectare mod din interfață:

@@ -133,34 +133,52 @@ static void run_gol_1d_internal(
 
         if (step == steps || !running) break;
 
-        MPI_Sendrecv(
-            &current[1],
-            1,
-            MPI_UNSIGNED_CHAR,
-            left_rank,
-            10,
-            &current[local_n + 1],
-            1,
-            MPI_UNSIGNED_CHAR,
-            right_rank,
-            10,
-            MPI_COMM_WORLD,
-            MPI_STATUS_IGNORE
-        );
+        MPI_Request requests[4];
 
-        MPI_Sendrecv(
-            &current[local_n],
-            1,
-            MPI_UNSIGNED_CHAR,
-            right_rank,
-            20,
+        MPI_Irecv(
             &current[0],
             1,
             MPI_UNSIGNED_CHAR,
             left_rank,
             20,
             MPI_COMM_WORLD,
-            MPI_STATUS_IGNORE
+            &requests[0]
+        );
+
+        MPI_Irecv(
+            &current[local_n + 1],
+            1,
+            MPI_UNSIGNED_CHAR,
+            right_rank,
+            10,
+            MPI_COMM_WORLD,
+            &requests[1]
+        );
+
+        MPI_Isend(
+            &current[1],
+            1,
+            MPI_UNSIGNED_CHAR,
+            left_rank,
+            10,
+            MPI_COMM_WORLD,
+            &requests[2]
+        );
+
+        MPI_Isend(
+            &current[local_n],
+            1,
+            MPI_UNSIGNED_CHAR,
+            right_rank,
+            20,
+            MPI_COMM_WORLD,
+            &requests[3]
+        );
+
+        MPI_Waitall(
+            4,
+            requests,
+            MPI_STATUSES_IGNORE
         );
 
         for (int i = 1; i <= local_n; i++) {

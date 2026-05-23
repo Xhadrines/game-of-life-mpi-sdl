@@ -138,35 +138,53 @@ static void run_gol_2d_internal(
 
     double start_time = MPI_Wtime();
 
+    MPI_Request requests[4];
+    
     for (int step = 0; step < steps && running; step++) {
-        MPI_Sendrecv(
-            &current[cols],
-            cols,
-            MPI_UNSIGNED_CHAR,
-            up,
-            100,
-            &current[(local_rows + 1) * cols],
-            cols,
-            MPI_UNSIGNED_CHAR,
-            down,
-            100,
-            MPI_COMM_WORLD,
-            MPI_STATUS_IGNORE
-        );
-
-        MPI_Sendrecv(
-            &current[local_rows * cols],
-            cols,
-            MPI_UNSIGNED_CHAR,
-            down,
-            200,
+        MPI_Irecv(
             &current[0],
             cols,
             MPI_UNSIGNED_CHAR,
             up,
             200,
             MPI_COMM_WORLD,
-            MPI_STATUS_IGNORE
+            &requests[0]
+        );
+
+        MPI_Irecv(
+            &current[(local_rows + 1) * cols],
+            cols,
+            MPI_UNSIGNED_CHAR,
+            down,
+            100,
+            MPI_COMM_WORLD,
+            &requests[1]
+        );
+
+        MPI_Isend(
+            &current[cols],
+            cols,
+            MPI_UNSIGNED_CHAR,
+            up,
+            100,
+            MPI_COMM_WORLD,
+            &requests[2]
+        );
+
+        MPI_Isend(
+            &current[local_rows * cols],
+            cols,
+            MPI_UNSIGNED_CHAR,
+            down,
+            200,
+            MPI_COMM_WORLD,
+            &requests[3]
+        );
+
+        MPI_Waitall(
+            4,
+            requests,
+            MPI_STATUSES_IGNORE
         );
 
         memset(next, 0, (size_t)(local_rows + 2) * (size_t)cols);
