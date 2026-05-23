@@ -40,6 +40,8 @@ Implementare paralelă a jocului Conway's Game of Life folosind MPI și SDL2.
 - Măsurare performanță cu `MPI_Wtime`: timp total, timp comunicație și timp calcul
 - Export rezultate benchmark în format `.csv`
 - Generare grafice pentru speedup, eficiență, weak scaling și timp calcul vs comunicație
+- Validare bit-cu-bit între implementarea serială și MPI
+- Reproducibilitate folosind seed determinist
 - Creare automată pentru directoarele `build/` și `output/*`
 
 ## Tehnologii folosite
@@ -190,6 +192,12 @@ make weak_scaling
 make analyze_benchmarks
 ```
 
+## Validare serial vs MPI
+
+```bash
+make validate2d
+```
+
 ## Structura proiectului
 
 ```text
@@ -208,9 +216,12 @@ game-of-life-mpi-sdl/
 │   │   │   ├── gol_2d_parallel.h
 │   │   │   └── gol_2d_parallel_toroidal.h
 │   │   │
-│   │   └── serial/
-│   │       ├── gol_1d_serial.h
-│   │       └── gol_2d_serial.h
+│   │   ├── serial/
+│   │   │   ├── gol_1d_serial.h
+│   │   │   └── gol_2d_serial.h
+│   │   │
+│   │   └── validation/
+│   │       └── gol_2d_validation.h
 │   │
 │   ├── ui/
 │   │   └── sdl_viewer.h
@@ -236,9 +247,12 @@ game-of-life-mpi-sdl/
 │   │   │   ├── gol_2d_parallel.c
 │   │   │   └── gol_2d_parallel_toroidal.c
 │   │   │
-│   │   └── serial/
-│   │       ├── gol_1d_serial.c
-│   │       └── gol_2d_serial.c
+│   │   ├── serial/
+│   │   │   ├── gol_1d_serial.c
+│   │   │   └── gol_2d_serial.c
+│   │   │
+│   │   └── validation/
+│   │       └── gol_2d_validation.h
 │   │
 │   ├── ui/
 │   │   └── sdl_viewer.c

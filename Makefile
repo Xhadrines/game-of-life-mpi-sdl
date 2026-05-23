@@ -14,6 +14,7 @@ SRC=src/main.c \
 	src/core/parallel/gol_2d_parallel_toroidal.c \
 	src/core/serial/gol_1d_serial.c \
     src/core/serial/gol_2d_serial.c \
+	src/core/validation/gol_2d_validation.c \
     src/utils/utils.c \
 	src/utils/patterns.c \
     src/ui/sdl_viewer.c
@@ -139,6 +140,13 @@ weak_scaling: $(TARGET)
 	mpirun -np 8 ./$(TARGET) parallel2d 7072 7072 100 weak_p8 0
 
 	mpirun --oversubscribe -np 16 ./$(TARGET) parallel2d 10000 10000 100 weak_p16 0
+
+# =========================
+# VALIDATION
+# =========================
+
+validate2d: $(TARGET)
+	mpirun -np 4 ./$(TARGET) validate2d 100 100 100 0
 
 # =========================
 # CLEAN

@@ -8,6 +8,7 @@
 #include "../include/core/parallel/gol_2d_parallel_toroidal.h"
 #include "../include/core/serial/gol_1d_serial.h"
 #include "../include/core/serial/gol_2d_serial.h"
+#include "../include/core/validation/gol_2d_validation.h"
 #include "../include/ui/sdl_viewer.h"
 
 int main(int argc, char **argv) {
@@ -147,6 +148,15 @@ int main(int argc, char **argv) {
             atoi(argv[4]),
             argv[5],
             atoi(argv[6])
+        );
+    }
+
+    else if (strcmp(argv[1], "validate2d") == 0 && argc == 6) {
+        run_gol_2d_validation(
+            atoi(argv[2]),
+            atoi(argv[3]),
+            atoi(argv[4]),
+            atoi(argv[5])
         );
     }
 
