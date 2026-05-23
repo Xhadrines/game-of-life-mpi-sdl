@@ -9,6 +9,10 @@
 #include "../include/ui/sdl_viewer.h"
 #include "../include/core/parallel/gol_2d_parallel_toroidal.h"
 
+/*
+ * Functie: owner_rows (static)
+ * Ce face: calculeaza cate randuri primeste fiecare proces.
+ */
 static int owner_rows(int rows, int size, int rank) {
     int base = rows / size;
     int rem = rows % size;
@@ -16,6 +20,10 @@ static int owner_rows(int rows, int size, int rank) {
     return base + (rank < rem ? 1 : 0);
 }
 
+/*
+ * Functie: owner_offset (static)
+ * Ce face: offset pentru randul de start al fiecarui proces.
+ */
 static int owner_offset(int rows, int size, int rank) {
     int offset = 0;
 
@@ -26,6 +34,11 @@ static int owner_offset(int rows, int size, int rank) {
     return offset;
 }
 
+/*
+ * Functie: alive_at (static)
+ * Ce face: verifica starea unei celule in buffer-ul local cu validare pentru randuri
+ *          si wrap-around pe coloane (toroidal pe coloane).
+ */
 static int alive_at(
     const unsigned char *grid,
     int local_rows,
@@ -42,6 +55,11 @@ static int alive_at(
     return grid[r * cols + wrapped_c] ? 1 : 0;
 }
 
+/*
+ * Functie: step_2d_toroidal_range (static)
+ * Ce face: calculeaza generatiile pentru un range local luand in considerare
+ *          vecinii cu comportament toroidal pe coloane.
+ */
 static void step_2d_toroidal_range(
     unsigned char *current,
     unsigned char *next,
@@ -78,6 +96,11 @@ static void step_2d_toroidal_range(
     }
 }
 
+/*
+ * Functie: run_gol_2d_toroidal_internal (static)
+ * Ce face: implementarea principala pentru simularea MPI 2D cu topologie toroidala
+ *          (periodica) - foloseste `MPI_Cart_create` cu `periods = 1`.
+ */
 static void run_gol_2d_toroidal_internal(
     int rows,
     int cols,
@@ -378,6 +401,10 @@ static void run_gol_2d_toroidal_internal(
     }
 }
 
+/*
+ * Functie: run_gol_2d_parallel_toroidal
+ * Ce face: wrapper non-vizual pentru rularea cu topologie toroidala.
+ */
 void run_gol_2d_parallel_toroidal(
     int rows,
     int cols,
@@ -388,6 +415,10 @@ void run_gol_2d_parallel_toroidal(
     run_gol_2d_toroidal_internal(rows, cols, steps, out_path, 0, 1, 0, pattern_type);
 }
 
+/*
+ * Functie: run_gol_2d_parallel_toroidal_visual
+ * Ce face: wrapper vizual pentru rularea cu topologie toroidala.
+ */
 void run_gol_2d_parallel_toroidal_visual(
     int rows,
     int cols,

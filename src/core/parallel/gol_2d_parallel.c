@@ -9,6 +9,10 @@
 #include "../include/ui/sdl_viewer.h"
 #include "../include/core/parallel/gol_2d_parallel.h"
 
+/*
+ * Functie: owner_rows (static)
+ * Ce face: calculeaza numarul de randuri atribuite fiecarui proces (imparsire cu rest).
+ */
 static int owner_rows(int rows, int size, int rank) {
     int base = rows / size;
     int rem = rows % size;
@@ -16,6 +20,10 @@ static int owner_rows(int rows, int size, int rank) {
     return base + (rank < rem ? 1 : 0);
 }
 
+/*
+ * Functie: owner_offset (static)
+ * Ce face: calcul offset pentru randul de start al unui proces in grid-ul global.
+ */
 static int owner_offset(int rows, int size, int rank) {
     int offset = 0;
 
@@ -26,6 +34,10 @@ static int owner_offset(int rows, int size, int rank) {
     return offset;
 }
 
+/*
+ * Functie: alive_at (static)
+ * Ce face: verifica daca o celula din buffer-ul local (cu ghost rows) este vie.
+ */
 static int alive_at(const unsigned char *grid, int local_rows, int cols, int r, int c) {
     if (c < 0 || c >= cols) return 0;
     if (r < 0 || r >= local_rows + 2) return 0;
@@ -33,6 +45,10 @@ static int alive_at(const unsigned char *grid, int local_rows, int cols, int r, 
     return grid[r * cols + c] ? 1 : 0;
 }
 
+/*
+ * Functie: step_2d_range (static)
+ * Ce face: calculeaza next pentru un range de randuri locale (folosit pentru overlap calcul-comunicasie).
+ */
 static void step_2d_range(
     unsigned char *current,
     unsigned char *next,
@@ -69,6 +85,12 @@ static void step_2d_range(
     }
 }
 
+/*
+ * Functie: run_gol_2d_internal (static)
+ * Ce face: logica comuna pentru rularea simularii MPI 2D; gestioneaza scatter/gatherv,
+ *          halo exchange non-blocking, masurare timp comunicasie vs calcul si export.
+ * Parametri: rows, cols, steps, out_path, use_sdl, scale, delay_ms, pattern_type
+ */
 static void run_gol_2d_internal(
     int rows,
     int cols,
@@ -369,10 +391,18 @@ static void run_gol_2d_internal(
     }
 }
 
+/*
+ * Functie: run_gol_2d_parallel
+ * Ce face: wrapper pentru rulare MPI 2D non-vizuala (apeleaza run_gol_2d_internal).
+ */
 void run_gol_2d_parallel(int rows, int cols, int steps, const char *out_path, int pattern_type) {
     run_gol_2d_internal(rows, cols, steps, out_path, 0, 1, 0, pattern_type);
 }
 
+/*
+ * Functie: run_gol_2d_parallel_visual
+ * Ce face: wrapper pentru rulare MPI 2D cu vizualizare.
+ */
 void run_gol_2d_parallel_visual(int rows, int cols, int steps, const char *out_path, int scale, int delay_ms, int pattern_type) {
     if (scale <= 0) scale = 4;
     if (delay_ms < 0) delay_ms = 20;

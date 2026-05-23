@@ -7,6 +7,10 @@
 #include "../../../include/ui/sdl_viewer.h"
 #include "../../../include/core/serial/gol_1d_serial.h"
 
+/*
+ * Functie: rule30 (static)
+ * Ce face: aplica regula 30 (automat celular 1D) pe trei bisi si returneaza bitul rezultat.
+ */
 static unsigned char rule30(
     unsigned char left,
     unsigned char center,
@@ -17,6 +21,11 @@ static unsigned char rule30(
     return (30 >> pattern) & 1;
 }
 
+/*
+ * Functie: run_gol_1d_serial_internal (static)
+ * Ce face: implementeaza bucla principala pentru simularea seriala 1D (rule30),
+ *          construieste istoricul pentru export si opsional afiseaza cu SDL.
+ */
 static void run_gol_1d_serial_internal(
     int global_n,
     int steps,
@@ -118,6 +127,10 @@ static void run_gol_1d_serial_internal(
     free(history);
 }
 
+/*
+ * Functie: run_gol_1d_serial
+ * Ce face: wrapper pentru rulare non-vizuala 1D.
+ */
 void run_gol_1d_serial(
     int global_n,
     int steps,
@@ -133,6 +146,10 @@ void run_gol_1d_serial(
     );
 }
 
+/*
+ * Functie: run_gol_1d_serial_visual
+ * Ce face: wrapper pentru rulare cu vizualizare SDL a simularii 1D.
+ */
 void run_gol_1d_serial_visual(
     int global_n,
     int steps,

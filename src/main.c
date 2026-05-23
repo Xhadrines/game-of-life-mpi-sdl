@@ -12,6 +12,18 @@
 #include "../include/core/validation/gol_2d_validation.h"
 #include "../include/ui/sdl_viewer.h"
 
+/*
+ * Functie: main
+ * Ce face: punctul de intrare al programului. Inisializeaza MPI, citeste
+ *          argumentele de linie de comanda sau afiseaza meniul SDL pe
+ *          `rank == 0`, transmite configurarea catre toate procesele si
+ *          apeleaza variantele seriale/paralele ale simularii.
+ * Parametri:
+ *   - argc, argv: argumente de linie de comanda (ex: "app", "parallel2d", ...)
+ * Returneaza: 0 la terminare normala; finalizeaza MPI inainte de iesire.
+ * Atensionari: Nu modifica logica - toate procesele trebuie sa apeleze
+ *             `MPI_Init`/`MPI_Finalize` corect.
+ */
 int main(int argc, char **argv) {
     MPI_Init(&argc, &argv);
 

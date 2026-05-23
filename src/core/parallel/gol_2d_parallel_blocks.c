@@ -8,10 +8,18 @@
 #include "../../../include/utils/patterns.h"
 #include "../../../include/core/parallel/gol_2d_parallel_blocks.h"
 
+/*
+ * Functie: idx (static)
+ * Ce face: helper pentru a calcula indexul linear dintr-un rand si coloana.
+ */
 static int idx(int r, int c, int width) {
     return r * width + c;
 }
 
+/*
+ * Functie: alive_at (static)
+ * Ce face: verifica starea unei celule in buffer-ul local 2D (cu ghost border).
+ */
 static int alive_at(
     const unsigned char *grid,
     int local_rows,
@@ -25,6 +33,10 @@ static int alive_at(
     return grid[idx(r, c, local_cols + 2)] ? 1 : 0;
 }
 
+/*
+ * Functie: step_blocks_range (static)
+ * Ce face: calculeaza next pentru un range de randuri in decompozitia pe blocuri.
+ */
 static void step_blocks_range(
     unsigned char *current,
     unsigned char *next,
@@ -63,6 +75,10 @@ static void step_blocks_range(
     }
 }
 
+/*
+ * Functie: copy_global_to_local_block (static)
+ * Ce face: copiaza un sub-bloc din grid-ul global in buffer-ul local (cu padding pentru ghost).
+ */
 static void copy_global_to_local_block(
     const unsigned char *global,
     unsigned char *local,
@@ -83,6 +99,10 @@ static void copy_global_to_local_block(
     }
 }
 
+/*
+ * Functie: copy_local_block_to_global (static)
+ * Ce face: copiaza datele din buffer-ul local (fara ghost) in pozisia corespunzatoare din grid-ul global.
+ */
 static void copy_local_block_to_global(
     unsigned char *global,
     const unsigned char *local,
@@ -102,6 +122,12 @@ static void copy_local_block_to_global(
     }
 }
 
+/*
+ * Functie: run_gol_2d_parallel_blocks
+ * Ce face: implementeaza decompozitia 2D pe blocuri, construieste topologia carteziana,
+ *          coordoneaza exchange-ul de halo si reconstituie rezultatul final pe rank 0.
+ * Parametri: rows, cols, steps, out_path, pattern_type
+ */
 void run_gol_2d_parallel_blocks(
     int rows,
     int cols,

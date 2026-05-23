@@ -8,6 +8,10 @@
 #include "../include/ui/sdl_viewer.h"
 #include "../include/core/parallel/gol_1d_parallel.h"
 
+/*
+ * Functie: owner_cells (static)
+ * Ce face: calculeaza cate celule primeste fiecare proces in decompozitia 1D.
+ */
 static int owner_cells(int n, int size, int rank) {
     int base = n / size;
     int rem = n % size;
@@ -15,6 +19,10 @@ static int owner_cells(int n, int size, int rank) {
     return base + (rank < rem ? 1 : 0);
 }
 
+/*
+ * Functie: owner_offset (static)
+ * Ce face: calculeaza offset-ul (indexul de start) pentru un proces in vectorul global.
+ */
 static int owner_offset(int n, int size, int rank) {
     int offset = 0;
 
@@ -25,12 +33,21 @@ static int owner_offset(int n, int size, int rank) {
     return offset;
 }
 
+/*
+ * Functie: rule30 (static)
+ * Ce face: implementeaza Rule 30 pentru trei bisi si returneaza rezultatul.
+ */
 static unsigned char rule30(unsigned char left, unsigned char center, unsigned char right) {
     int pattern = (left << 2) | (center << 1) | right;
 
     return (30 >> pattern) & 1;
 }
 
+/*
+ * Functie: run_gol_1d_internal (static)
+ * Ce face: implementeaza bucla principala pentru simularea paralela 1D,
+ *          gestiunea exchange-ului cu vecinii si reconstrucsia istoriei.
+ */
 static void run_gol_1d_internal(
     int global_n,
     int steps,
@@ -223,10 +240,18 @@ static void run_gol_1d_internal(
     }
 }
 
+/*
+ * Functie: run_gol_1d_parallel
+ * Ce face: wrapper pentru rulare paralela 1D non-vizuala.
+ */
 void run_gol_1d_parallel(int global_n, int steps, const char *out_path) {
     run_gol_1d_internal(global_n, steps, out_path, 0, 1, 0);
 }
 
+/*
+ * Functie: run_gol_1d_parallel_visual
+ * Ce face: wrapper pentru rulare paralela 1D cu vizualizare SDL.
+ */
 void run_gol_1d_parallel_visual(int global_n, int steps, const char *out_path, int scale, int delay_ms) {
     if (scale <= 0) scale = 1;
     if (delay_ms < 0) delay_ms = 10;

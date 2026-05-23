@@ -8,6 +8,10 @@
 #include "../../../include/ui/sdl_viewer.h"
 #include "../../../include/core/serial/gol_2d_serial.h"
 
+/*
+ * Functie: alive_at (static)
+ * Ce face: intoarce 1 daca celula (r,c) este vie, cu wrap-around toroidal.
+ */
 static int alive_at(
     const unsigned char *grid,
     int rows,
@@ -21,6 +25,10 @@ static int alive_at(
     return grid[wrapped_r * cols + wrapped_c] ? 1 : 0;
 }
 
+/*
+ * Functie: step_2d_serial (static)
+ * Ce face: calculeaza next pentru fiecare celula din grid-ul serial (toroidal).
+ */
 static void step_2d_serial(
     const unsigned char *current,
     unsigned char *next,
@@ -55,6 +63,12 @@ static void step_2d_serial(
     }
 }
 
+/*
+ * Functie: run_gol_2d_serial_internal (static)
+ * Ce face: implementeaza bucla principala pentru simularea seriala 2D;
+ *          poate rula cu sau fara UI (use_sdl).
+ * Parametri: rows, cols, steps, out_path, use_sdl (0/1), scale, delay_ms, pattern_type
+ */
 static void run_gol_2d_serial_internal(
     int rows,
     int cols,
@@ -153,6 +167,10 @@ static void run_gol_2d_serial_internal(
     free(next);
 }
 
+/*
+ * Functie: run_gol_2d_serial
+ * Ce face: wrapper pentru rulare non-vizuala a simularii seriale 2D.
+ */
 void run_gol_2d_serial(
     int rows,
     int cols,
@@ -172,6 +190,10 @@ void run_gol_2d_serial(
     );
 }
 
+/*
+ * Functie: run_gol_2d_serial_visual
+ * Ce face: wrapper pentru rulare cu vizualizare SDL2 a simularii seriale 2D.
+ */
 void run_gol_2d_serial_visual(
     int rows,
     int cols,

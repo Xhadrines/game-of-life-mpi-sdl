@@ -9,6 +9,12 @@
 
 #define VALIDATION_SEED 42
 
+/*
+ * Functie: owner_rows (static)
+ * Ce face: calculeaza cate randuri primeste fiecare proces (imparsire cu rest).
+ * Parametri: rows (total), size (nr. procese), rank (indice proces)
+ * Returneaza: numarul de randuri pentru `rank`.
+ */
 static int owner_rows(int rows, int size, int rank) {
     int base = rows / size;
     int rem = rows % size;
@@ -16,6 +22,10 @@ static int owner_rows(int rows, int size, int rank) {
     return base + (rank < rem ? 1 : 0);
 }
 
+/*
+ * Functie: owner_offset (static)
+ * Ce face: calculeaza offset-ul (randul de inceput) pentru un proces in grid-ul global.
+ */
 static int owner_offset(int rows, int size, int rank) {
     int offset = 0;
 
@@ -26,6 +36,11 @@ static int owner_offset(int rows, int size, int rank) {
     return offset;
 }
 
+/*
+ * Functie: alive_at_serial (static)
+ * Ce face: intoarce 1 daca celula (r,c) este vie (cu wrap-around toroidal), 0 altfel.
+ * Parametri: grid global, rows, cols, coordonate r,c (pot fi negative sau >dim-1)
+ */
 static int alive_at_serial(
     const unsigned char *grid,
     int rows,
@@ -39,6 +54,11 @@ static int alive_at_serial(
     return grid[wrapped_r * cols + wrapped_c] ? 1 : 0;
 }
 
+/*
+ * Functie: step_serial_toroidal (static)
+ * Ce face: calculeaza o generasie urmatoare pentru grid-ul serial cu comportament toroidal.
+ * Parametri: current (input), next (output), rows, cols
+ */
 static void step_serial_toroidal(
     const unsigned char *current,
     unsigned char *next,
@@ -73,6 +93,11 @@ static void step_serial_toroidal(
     }
 }
 
+/*
+ * Functie: alive_at_parallel (static)
+ * Ce face: verifica daca o celula din buffer-ul local (care include ghost rows) este vie.
+ * Parametri: grid local (cu ghost rows), local_rows (fara ghost), cols, r (index local cu ghost), c
+ */
 static int alive_at_parallel(
     const unsigned char *grid,
     int local_rows,
@@ -89,6 +114,11 @@ static int alive_at_parallel(
     return grid[r * cols + wrapped_c] ? 1 : 0;
 }
 
+/*
+ * Functie: step_parallel_toroidal (static)
+ * Ce face: calculeaza generasiile pentru porsiunea locala a procesului (fara a se ocupa de recv/send).
+ * Parametri: current (cu ghost rows), next, local_rows, cols
+ */
 static void step_parallel_toroidal(
     const unsigned char *current,
     unsigned char *next,
@@ -123,6 +153,13 @@ static void step_parallel_toroidal(
     }
 }
 
+/*
+ * Functie: run_gol_2d_validation
+ * Ce face: ruleaza validarea comparand rezultatul serial cu cel obsinut prin MPI
+ *          (bit-cu-bit). Rank 0 genereaza input-ul si ruleaza versiunea seriala;
+ *          procesele MPI ruleaza paralel si se reconstruieste rezultatul cu MPI_Gatherv.
+ * Parametri: rows, cols, steps, pattern_type
+ */
 void run_gol_2d_validation(
     int rows,
     int cols,

@@ -4,12 +4,30 @@
 
 #include "../include/utils/utils.h"
 
+/*
+ * Functie: alloc_grid
+ * Ce face: aloca un buffer pentru grid (rows x cols) si inisializeaza cu 0.
+ * Parametri: rows, cols - dimensiunile gridului.
+ * Returneaza: pointer la memorie (unsigned char*) sau NULL la eroare.
+ * Atensionari: Verifica intotdeauna returnul in apeluri; foloseste `free()`.
+ */
 unsigned char *alloc_grid(int rows, int cols) {
     if (rows <= 0 || cols <= 0) return NULL;
 
     return calloc((size_t)rows * (size_t)cols, sizeof(unsigned char));
 }
 
+/*
+ * Functie: random_fill
+ * Ce face: completeaza grid-ul cu valori 0/1 pe baza probabilitasii `alive_prob`.
+ * Parametri:
+ *   - grid: buffer prealocat de dimensiune rows*cols
+ *   - rows, cols: dimensiunile gridului
+ *   - alive_prob: probabilitatea ca o celula sa fie vie (0..1)
+ *   - seed: seed pentru rand() (reproducibilitate)
+ * Returneaza: nimic (efecte asupra `grid`).
+ * Atensionari: Daca `grid` este NULL, nu face nimic.
+ */
 void random_fill(unsigned char *grid, int rows, int cols, double alive_prob, unsigned int seed) {
     if (!grid) return;
 
@@ -21,6 +39,13 @@ void random_fill(unsigned char *grid, int rows, int cols, double alive_prob, uns
     }
 }
 
+/*
+ * Functie: write_pgm
+ * Ce face: scrie imaginea in format PGM (P2) pe disk.
+ * Parametri: path (cale fisier), grid (0/1), rows, cols
+ * Returneaza: 1 la succes, 0 la eroare (si afiseaza perror()).
+ * Atensionari: Formatele PGM/P3 folosite de proiect asteapta valori 0/255.
+ */
 int write_pgm(const char *path, const unsigned char *grid, int rows, int cols) {
     FILE *f = fopen(path, "w");
 
@@ -43,6 +68,12 @@ int write_pgm(const char *path, const unsigned char *grid, int rows, int cols) {
     return 1;
 }
 
+/*
+ * Functie: write_ppm
+ * Ce face: scrie imaginea in format PPM (P3) pe disk; celulele vii devin albe.
+ * Parametri: path, grid, rows, cols
+ * Returneaza: 1 la succes, 0 la eroare.
+ */
 int write_ppm(const char *path, const unsigned char *grid, int rows, int cols) {
     FILE *f = fopen(path, "w");
 
@@ -69,6 +100,13 @@ int write_ppm(const char *path, const unsigned char *grid, int rows, int cols) {
     return 1;
 }
 
+/*
+ * Functie: write_txt
+ * Ce face: scrie grid-ul intr-un fisier text folosind '#' pentru vie si '.' pentru moarta.
+ * Parametri: path, grid, rows, cols
+ * Returneaza: 1 la succes, 0 la eroare.
+ * Atensionari: Apelata doar cand grid-ul e mic (vezi `TXT_EXPORT_MAX_*`).
+ */
 int write_txt(
     const char *path,
     const unsigned char *grid,
@@ -98,6 +136,12 @@ int write_txt(
     return 1;
 }
 
+/*
+ * Functie: write_output_files
+ * Ce face: wrapper ce scrie PGM, PPM si (opsional) TXT pentru un grid.
+ * Parametri: base_name (prefix pentru fisiere), grid, rows, cols
+ * Returneaza: 1 daca toate scrierile necesare reusesc, altfel 0.
+ */
 int write_output_files(
     const char *base_name,
     const unsigned char *grid,
@@ -149,6 +193,13 @@ int write_output_files(
     return ok_pgm && ok_ppm && ok_txt;
 }
 
+/*
+ * Functie: append_benchmark_csv
+ * Ce face: adauga un rand in `output/benchmarks/benchmark_results.csv` cu timpii.
+ * Parametri: run_name, mode, processes, rows, cols, steps, total_time, communication_time, computation_time
+ * Returneaza: 1 la succes, 0 la eroare.
+ * Atensionari: Creeaza header-ul daca fisierul nu exista.
+ */
 int append_benchmark_csv(
     const char *run_name,
     const char *mode,

@@ -4,6 +4,12 @@
 #include "../../include/utils/patterns.h"
 #include "../../include/utils/utils.h"
 
+/*
+ * Functie: pattern_name
+ * Ce face: intoarce un nume usor de citit pentru tipul de pattern.
+ * Parametri: pattern_type (PATTERN_RANDOM, PATTERN_GLIDER, PATTERN_BLINKER)
+ * Returneaza: const char* cu numele pattern-ului.
+ */
 const char *pattern_name(int pattern_type) {
     switch (pattern_type) {
         case PATTERN_RANDOM:
@@ -17,10 +23,20 @@ const char *pattern_name(int pattern_type) {
     }
 }
 
+/*
+ * Functie: clear_grid (static, helper)
+ * Ce face: seteaza toate celulele la 0.
+ * Parametri: grid, rows, cols
+ */
 static void clear_grid(unsigned char *grid, int rows, int cols) {
     memset(grid, 0, (size_t)rows * (size_t)cols);
 }
 
+/*
+ * Functie: set_cell (static, helper)
+ * Ce face: seteaza o celula la 1 daca coordonatele sunt valide.
+ * Parametri: grid, rows, cols, r, c
+ */
 static void set_cell(unsigned char *grid, int rows, int cols, int r, int c) {
     if (!grid) return;
     if (r < 0 || r >= rows) return;
@@ -29,6 +45,10 @@ static void set_cell(unsigned char *grid, int rows, int cols, int r, int c) {
     grid[r * cols + c] = 1;
 }
 
+/*
+ * Functie: apply_glider (static, helper)
+ * Ce face: aplica pattern-ul "glider" centrat in grid.
+ */
 static void apply_glider(unsigned char *grid, int rows, int cols) {
     clear_grid(grid, rows, cols);
 
@@ -42,6 +62,10 @@ static void apply_glider(unsigned char *grid, int rows, int cols) {
     set_cell(grid, rows, cols, r + 2, c + 2);
 }
 
+/*
+ * Functie: apply_blinker (static, helper)
+ * Ce face: aplica pattern-ul "blinker" centrat in grid.
+ */
 static void apply_blinker(unsigned char *grid, int rows, int cols) {
     clear_grid(grid, rows, cols);
 
@@ -53,6 +77,12 @@ static void apply_blinker(unsigned char *grid, int rows, int cols) {
     set_cell(grid, rows, cols, r, c + 1);
 }
 
+/*
+ * Functie: apply_pattern
+ * Ce face: alege si aplica un pattern pe grid: random, glider sau blinker.
+ * Parametri: grid, rows, cols, pattern_type, seed (pentru random)
+ * Atensionari: Daca grid este NULL, nu face nimic.
+ */
 void apply_pattern(
     unsigned char *grid,
     int rows,

@@ -48,6 +48,13 @@ static TTF_Font *load_font(int size) {
     return TTF_OpenFont("assets/fonts/DejaVuSans.ttf", size);
 }
 
+/*
+ * Functie: init_window (static)
+ * Ce face: initializeaza SDL2 si TTF, incarca fonturile si creeaza fereastra + renderer.
+ * Parametri: title, width, height
+ * Returneaza: 1 la succes, 0 la eroare (si afiseaza mesaj pe stderr).
+ * Atensionari: Apeleaza `SDL_Quit()` la eroare pentru a curasa resursele.
+ */
 static int init_window(const char *title, int width, int height) {
     if (SDL_Init(SDL_INIT_VIDEO) != 0) {
         fprintf(stderr, "SDL_Init error: %s\n", SDL_GetError());
@@ -95,6 +102,10 @@ static int init_window(const char *title, int width, int height) {
     return 1;
 }
 
+/*
+ * Functie: close_window (static)
+ * Ce face: elibereaza fonturile, renderer-ul si fereastra si opreste TTF/SDL.
+ */
 static void close_window(void) {
     if (font_small) TTF_CloseFont(font_small);
     if (font_medium) TTF_CloseFont(font_medium);
@@ -114,6 +125,11 @@ static void close_window(void) {
     SDL_Quit();
 }
 
+/*
+ * Functie: inside (static)
+ * Ce face: verifica daca punctul (x,y) este in interiorul rect-ului.
+ * Returneaza: 1 daca da, 0 altfel.
+ */
 static int inside(SDL_Rect rect, int x, int y) {
     return x >= rect.x &&
            x <= rect.x + rect.w &&
@@ -121,6 +137,11 @@ static int inside(SDL_Rect rect, int x, int y) {
            y <= rect.y + rect.h;
 }
 
+/*
+ * Functie: draw_text (static)
+ * Ce face: deseneaza text simplu la pozisia (x,y) folosind fontul dat.
+ * Atensionari: Nu face nimic daca fontul sau renderer-ul lipsesc.
+ */
 static void draw_text(const char *text, int x, int y, TTF_Font *font) {
     if (!font || !renderer || !text) return;
 
@@ -140,6 +161,10 @@ static void draw_text(const char *text, int x, int y, TTF_Font *font) {
     SDL_DestroyTexture(texture);
 }
 
+/*
+ * Functie: draw_text_color (static)
+ * Ce face: deseneaza text colorat la pozisia (x,y).
+ */
 static void draw_text_color(
     const char *text,
     int x,
@@ -163,6 +188,10 @@ static void draw_text_color(
     SDL_DestroyTexture(texture);
 }
 
+/*
+ * Functie: draw_centered_text (static)
+ * Ce face: deseneaza text centrat in interiorul unui `SDL_Rect`.
+ */
 static void draw_centered_text(const char *text, SDL_Rect rect, TTF_Font *font) {
     if (!font || !text) return;
 
@@ -177,6 +206,10 @@ static void draw_centered_text(const char *text, SDL_Rect rect, TTF_Font *font) 
     draw_text(text, x, y, font);
 }
 
+/*
+ * Functie: draw_button (static)
+ * Ce face: deseneaza un buton simplu (umplere + contur + label centrat).
+ */
 static void draw_button(SDL_Rect rect, int active, int r, int g, int b, const char *label) {
     if (active) {
         SDL_SetRenderDrawColor(renderer, 230, 180, 40, 255);
@@ -192,6 +225,10 @@ static void draw_button(SDL_Rect rect, int active, int r, int g, int b, const ch
     draw_centered_text(label, rect, font_medium);
 }
 
+/*
+ * Functie: draw_field (static)
+ * Ce face: deseneaza un camp cu nume si valoare (folosit in meniul UI).
+ */
 static void draw_field(SDL_Rect rect, int active, const char *name, int value) {
     char buffer[64];
 
@@ -212,6 +249,10 @@ static void draw_field(SDL_Rect rect, int active, const char *name, int value) {
     draw_text(buffer, rect.x + 20, rect.y + 50, font_medium);
 }
 
+/*
+ * Functie: draw_field_text (static)
+ * Ce face: aceleasi ca draw_field, dar afiseaza un text (nu un int).
+ */
 static void draw_field_text(SDL_Rect rect, int active, const char *name, const char *value) {
     if (active) {
         SDL_SetRenderDrawColor(renderer, 70, 130, 180, 255);
@@ -228,6 +269,10 @@ static void draw_field_text(SDL_Rect rect, int active, const char *name, const c
     draw_text(value, rect.x + 20, rect.y + 50, font_medium);
 }
 
+/*
+ * Functie: set_defaults_1d (static)
+ * Ce face: seteaza valorile implicite pentru modul 1D in funcsie de numarul de procese MPI.
+ */
 static void set_defaults_1d(int mpi_size, int *rows, int *cols, int *steps, int *scale, int *delay_ms) {
     *rows = 500 * mpi_size;
     *cols = 1;
@@ -236,6 +281,10 @@ static void set_defaults_1d(int mpi_size, int *rows, int *cols, int *steps, int 
     *delay_ms = 10;
 }
 
+/*
+ * Functie: set_defaults_2d (static)
+ * Ce face: seteaza valorile implicite pentru modul 2D.
+ */
 static void set_defaults_2d(int mpi_size, int *rows, int *cols, int *steps, int *scale, int *delay_ms) {
     *rows = 125 * mpi_size;
     *cols = 125 * mpi_size;
@@ -244,6 +293,12 @@ static void set_defaults_2d(int mpi_size, int *rows, int *cols, int *steps, int 
     *delay_ms = 10;
 }
 
+/*
+ * Functie: sdl_app_menu
+ * Ce face: afiseaza meniul interactiv SDL pe `rank == 0`, permite alegerea modului
+ *          si a parametrilor. Returneaza 1 daca utilizatorul a confirmat si 0 altfel.
+ * Parametri: mpi_size - numarul de procese MPI; alsi parametri sunt referinse pentru output.
+ */
 int sdl_app_menu(
     int mpi_size,
     int *mode,
@@ -582,6 +637,12 @@ int sdl_app_menu(
     return confirmed;
 }
 
+/*
+ * Functie: sdl_init_viewer
+ * Ce face: inisializeaza fereastra de vizualizare pentru simulare (folosit inainte de redare).
+ * Parametri: rows, cols, scale
+ * Returneaza: 1 la succes, 0 la eroare.
+ */
 int sdl_init_viewer(int rows, int cols, int scale) {
     scale_global = scale;
 
@@ -601,6 +662,12 @@ int sdl_init_viewer(int rows, int cols, int scale) {
     return init_window("Game of Life MPI - running", width, height);
 }
 
+/*
+ * Functie: sdl_render_grid
+ * Ce face: deseneaza grid-ul pe fereastra, trateaza inputul (ESC/SPACE) si pause.
+ * Parametri: grid, rows, cols, delay_ms, mode_name, generation, total_generations
+ * Returneaza: 1 daca se continua simularea, 0 daca trebuie oprita.
+ */
 int sdl_render_grid(
     const unsigned char *grid,
     int rows,
@@ -709,6 +776,11 @@ int sdl_render_grid(
     return 1;
 }
 
+/*
+ * Functie: sdl_wait_for_enter
+ * Ce face: afiseaza un mesaj si asteapta ca utilizatorul sa apese ENTER/ESC.
+ * Parametri: message, elapsed (timpul trecut pentru afisare)
+ */
 void sdl_wait_for_enter(const char *message, double elapsed) {
     int waiting = 1;
 
@@ -754,6 +826,10 @@ void sdl_wait_for_enter(const char *message, double elapsed) {
     }
 }
 
+/*
+ * Functie: sdl_close_viewer
+ * Ce face: inchide fereastra si elibereaza resursele SDL utilizate pentru vizualizare.
+ */
 void sdl_close_viewer(void) {
     close_window();
 }
