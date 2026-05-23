@@ -42,13 +42,15 @@ static int alive_at(
     return grid[r * cols + wrapped_c] ? 1 : 0;
 }
 
-static void step_2d_toroidal(
+static void step_2d_toroidal_range(
     unsigned char *current,
     unsigned char *next,
     int local_rows,
-    int cols
+    int cols,
+    int start_row,
+    int end_row
 ) {
-    for (int r = 1; r <= local_rows; r++) {
+    for (int r = start_row; r <= end_row; r++) {
         for (int c = 0; c < cols; c++) {
             int neighbors = 0;
 
@@ -139,8 +141,30 @@ static void run_gol_2d_toroidal_internal(
         MPI_COMM_WORLD
     );
 
-    int up = (rank - 1 + size) % size;
-    int down = (rank + 1) % size;
+    MPI_Comm cart_comm;
+
+    int dims[1] = {size};
+    int periods[1] = {1};
+    int reorder = 0;
+
+    MPI_Cart_create(
+        MPI_COMM_WORLD,
+        1,
+        dims,
+        periods,
+        reorder,
+        &cart_comm
+    );
+
+    int up, down;
+
+    MPI_Cart_shift(
+        cart_comm,
+        0,
+        1,
+        &up,
+        &down
+    );
 
     int running = 1;
 
@@ -166,7 +190,7 @@ static void run_gol_2d_toroidal_internal(
             MPI_UNSIGNED_CHAR,
             up,
             200,
-            MPI_COMM_WORLD,
+            cart_comm,
             &requests[0]
         );
 
@@ -176,7 +200,7 @@ static void run_gol_2d_toroidal_internal(
             MPI_UNSIGNED_CHAR,
             down,
             100,
-            MPI_COMM_WORLD,
+            cart_comm,
             &requests[1]
         );
 
@@ -186,7 +210,7 @@ static void run_gol_2d_toroidal_internal(
             MPI_UNSIGNED_CHAR,
             up,
             100,
-            MPI_COMM_WORLD,
+            cart_comm,
             &requests[2]
         );
 
@@ -196,9 +220,30 @@ static void run_gol_2d_toroidal_internal(
             MPI_UNSIGNED_CHAR,
             down,
             200,
-            MPI_COMM_WORLD,
+            cart_comm,
             &requests[3]
         );
+
+        communication_time += MPI_Wtime() - comm_start;
+
+        double comp_start = MPI_Wtime();
+
+        memset(next, 0, (size_t)(local_rows + 2) * (size_t)cols);
+
+        if (local_rows > 2) {
+            step_2d_toroidal_range(
+                current,
+                next,
+                local_rows,
+                cols,
+                2,
+                local_rows - 1
+            );
+        }
+
+        computation_time += MPI_Wtime() - comp_start;
+
+        comm_start = MPI_Wtime();
 
         MPI_Waitall(
             4,
@@ -208,11 +253,29 @@ static void run_gol_2d_toroidal_internal(
 
         communication_time += MPI_Wtime() - comm_start;
 
-        double comp_start = MPI_Wtime();
+        comp_start = MPI_Wtime();
 
-        memset(next, 0, (size_t)(local_rows + 2) * (size_t)cols);
+        if (local_rows >= 1) {
+            step_2d_toroidal_range(
+                current,
+                next,
+                local_rows,
+                cols,
+                1,
+                1
+            );
+        }
 
-        step_2d_toroidal(current, next, local_rows, cols);
+        if (local_rows >= 2) {
+            step_2d_toroidal_range(
+                current,
+                next,
+                local_rows,
+                cols,
+                local_rows,
+                local_rows
+            );
+        }
 
         computation_time += MPI_Wtime() - comp_start;
 
@@ -302,6 +365,8 @@ static void run_gol_2d_toroidal_internal(
             sdl_close_viewer();
         }
     }
+
+    MPI_Comm_free(&cart_comm);
 
     free(current);
     free(next);

@@ -13,7 +13,7 @@ Implementare paralelă a jocului Conway's Game of Life folosind MPI și SDL2.
 - Comunicații non-blocking folosind `MPI_Isend`, `MPI_Irecv` și `MPI_Waitall`
 - Evitare deadlock prin recepții non-blocking, trimiteri non-blocking și sincronizare cu `MPI_Waitall`
 - Implementare paralelă 2D cu grilă toroidală / periodică
-- Rulare din terminal pentru variantele seriale și paralele
+- Rulare din terminal pentru variantele seriale, paralele și 2D blocks
 - Rulare benchmark pentru grile mari `10000 x 10000`
 - Rulare locală cu 4, 8, 12 și 16 procese MPI
 - Interfață grafică SDL2
@@ -42,6 +42,9 @@ Implementare paralelă a jocului Conway's Game of Life folosind MPI și SDL2.
 - Generare grafice pentru speedup, eficiență, weak scaling și timp calcul vs comunicație
 - Validare bit-cu-bit între implementarea serială și MPI
 - Reproducibilitate folosind seed determinist
+- Topologie carteziană MPI folosind `MPI_Cart_create`
+- Overlap calcul-comunicație pentru halo exchange și update-ul generațiilor
+- Descompunere 2D blocks folosind topologie carteziană MPI
 - Creare automată pentru directoarele `build/` și `output/*`
 
 ## Tehnologii folosite
@@ -130,6 +133,12 @@ make parallel1d
 make parallel2d
 ```
 
+#### 2D Parallel Blocks
+
+```bash
+make parallel2d_blocks
+```
+
 #### 2D Parallel Toroidal
 
 ```bash
@@ -155,6 +164,8 @@ make serial2d
 ---
 
 ### HPC Benchmarks (console only)
+
+> Benchmark-urile și analiza performanței rulează doar în modul console.
 
 #### Parallel 2D Benchmark (10000x10000)
 
@@ -214,6 +225,7 @@ game-of-life-mpi-sdl/
 │   │   ├── parallel/
 │   │   │   ├── gol_1d_parallel.h
 │   │   │   ├── gol_2d_parallel.h
+│   │   │   ├── gol_2d_parallel_blocks.h
 │   │   │   └── gol_2d_parallel_toroidal.h
 │   │   │
 │   │   ├── serial/
@@ -245,6 +257,7 @@ game-of-life-mpi-sdl/
 │   │   ├── parallel/
 │   │   │   ├── gol_1d_parallel.c
 │   │   │   ├── gol_2d_parallel.c
+│   │   │   ├── gol_2d_parallel_blocks.c
 │   │   │   └── gol_2d_parallel_toroidal.c
 │   │   │
 │   │   ├── serial/
@@ -252,7 +265,7 @@ game-of-life-mpi-sdl/
 │   │   │   └── gol_2d_serial.c
 │   │   │
 │   │   └── validation/
-│   │       └── gol_2d_validation.h
+│   │       └── gol_2d_validation.c
 │   │
 │   ├── ui/
 │   │   └── sdl_viewer.c

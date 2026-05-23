@@ -11,6 +11,7 @@ TARGET=build/gol_mpi
 SRC=src/main.c \
     src/core/parallel/gol_1d_parallel.c \
     src/core/parallel/gol_2d_parallel.c \
+	src/core/parallel/gol_2d_parallel_blocks.c \
 	src/core/parallel/gol_2d_parallel_toroidal.c \
 	src/core/serial/gol_1d_serial.c \
     src/core/serial/gol_2d_serial.c \
@@ -81,6 +82,9 @@ parallel1d: $(TARGET)
 
 parallel2d: $(TARGET)
 	mpirun -np 4 ./$(TARGET) parallel2d 500 500 1000 parallel2d 0
+
+parallel2d_blocks: $(TARGET)
+	mpirun -np 4 ./$(TARGET) parallel2d_blocks 500 500 1000 parallel2d_blocks 0
 
 parallel2d_toroidal: $(TARGET)
 	mpirun -np 4 ./$(TARGET) parallel2d_toroidal 500 500 1000 parallel2d_toroidal 0

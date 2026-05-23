@@ -5,6 +5,7 @@
 
 #include "../include/core/parallel/gol_1d_parallel.h"
 #include "../include/core/parallel/gol_2d_parallel.h"
+#include "../include/core/parallel/gol_2d_parallel_blocks.h"
 #include "../include/core/parallel/gol_2d_parallel_toroidal.h"
 #include "../include/core/serial/gol_1d_serial.h"
 #include "../include/core/serial/gol_2d_serial.h"
@@ -121,6 +122,16 @@ int main(int argc, char **argv) {
 
     else if (strcmp(argv[1], "parallel2d") == 0 && argc == 7) {
         run_gol_2d_parallel(atoi(argv[2]), atoi(argv[3]), atoi(argv[4]), argv[5], atoi(argv[6]));
+    }
+
+    else if (strcmp(argv[1], "parallel2d_blocks") == 0 && argc == 7) {
+        run_gol_2d_parallel_blocks(
+            atoi(argv[2]),
+            atoi(argv[3]),
+            atoi(argv[4]),
+            argv[5],
+            atoi(argv[6])
+        );
     }
 
     else if (strcmp(argv[1], "parallel2d_toroidal") == 0 && argc == 7) {
