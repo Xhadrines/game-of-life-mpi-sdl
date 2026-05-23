@@ -138,9 +138,14 @@ static void run_gol_2d_internal(
 
     double start_time = MPI_Wtime();
 
+    double communication_time = 0.0;
+    double computation_time = 0.0;
+
     MPI_Request requests[4];
     
     for (int step = 0; step < steps && running; step++) {
+        double comm_start = MPI_Wtime();
+
         MPI_Irecv(
             &current[0],
             cols,
@@ -187,9 +192,15 @@ static void run_gol_2d_internal(
             MPI_STATUSES_IGNORE
         );
 
+        communication_time += MPI_Wtime() - comm_start;
+
+        double comp_start = MPI_Wtime();
+
         memset(next, 0, (size_t)(local_rows + 2) * (size_t)cols);
 
         step_2d(current, next, local_rows, cols);
+
+        computation_time += MPI_Wtime() - comp_start;
 
         unsigned char *tmp = current;
         current = next;
@@ -241,7 +252,29 @@ static void run_gol_2d_internal(
 
     if (rank == 0) {
         if (write_output_files(out_path, global, rows, cols)) {
-            printf("Timp parallel 2D: %.6f secunde\n", elapsed);
+            double communication_percent = 0.0;
+
+            if (elapsed > 0.0) {
+                communication_percent = (communication_time / elapsed) * 100.0;
+            }
+
+            printf("Timp total simulare MPI 2D: %.6f secunde\n", elapsed);
+            printf("Timp petrecut in comunicatia MPI halo exchange: %.6f secunde\n", communication_time);
+            printf("Timp petrecut in calculul generatiilor Game of Life: %.6f secunde\n", computation_time);
+            printf("Procent din timpul total folosit pentru comunicatie MPI: %.2f%%\n", communication_percent);
+
+            append_benchmark_csv(
+                out_path,
+                "parallel2d",
+                size,
+                rows,
+                cols,
+                steps,
+                elapsed,
+                communication_time,
+                computation_time
+            );
+
             printf("Imagine PGM salvata: output/pgm/%s.pgm\n", out_path);
             printf("Imagine PPM salvata: output/ppm/%s.ppm\n", out_path);
 

@@ -1,4 +1,6 @@
 CC=mpicc
+PYTHON=.venv/bin/python
+PIP=.venv/bin/pip
 
 CFLAGS=-Wall -Wextra -O2 -Iinclude $(shell sdl2-config --cflags)
 
@@ -24,6 +26,8 @@ $(TARGET): $(SRC)
 	mkdir -p output/pgm
 	mkdir -p output/ppm
 	mkdir -p output/txt
+	mkdir -p output/benchmarks
+	mkdir -p output/graphs
 
 	$(CC) $(CFLAGS) $(SRC) -o $(TARGET) $(LDFLAGS)
 
@@ -42,6 +46,30 @@ run12: $(TARGET)
 
 run16: $(TARGET)
 	mpirun --oversubscribe -np 16 ./$(TARGET) app	# Add --oversubscribe flag to allow more processes than available CPU cores
+
+# =========================
+# MPI COMMAND ARGUMENTS
+# =========================
+
+# 1D format:
+# mpirun -np <numar_procese> ./build/gol_mpi parallel1d <size> <steps> <output_name>
+#
+# size        = dimensiunea automatonului 1D
+# steps       = număr generații
+# output_name = nume fișiere output
+
+# 2D format:
+# mpirun -np <numar_procese> ./build/gol_mpi parallel2d <rows> <cols> <steps> <output_name> <pattern>
+#
+# rows        = număr rânduri grid
+# cols        = număr coloane grid
+# steps       = număr generații
+# output_name = nume fișiere output
+
+# pattern:
+# 0 = random
+# 1 = glider
+# 2 = blinker
 
 # =========================
 # PARALLEL CONSOLE
@@ -83,8 +111,54 @@ benchmark2d_serial: $(TARGET)
 	./$(TARGET) serial2d 10000 10000 100 benchmark_2d_serial 0
 
 # =========================
+# STRONG SCALING
+# =========================
+
+strong_scaling: $(TARGET)
+	@echo "Running strong scaling benchmark..."
+
+	mpirun -np 1 ./$(TARGET) parallel2d 10000 10000 100 strong_p1 0
+
+	mpirun -np 4 ./$(TARGET) parallel2d 10000 10000 100 strong_p4 0
+
+	mpirun -np 8 ./$(TARGET) parallel2d 10000 10000 100 strong_p8 0
+
+	mpirun --oversubscribe -np 16 ./$(TARGET) parallel2d 10000 10000 100 strong_p16 0
+
+# =========================
+# WEAK SCALING
+# =========================
+
+weak_scaling: $(TARGET)
+	@echo "Running weak scaling benchmark..."
+
+	mpirun -np 1 ./$(TARGET) parallel2d 2500 2500 100 weak_p1 0
+
+	mpirun -np 4 ./$(TARGET) parallel2d 5000 5000 100 weak_p4 0
+
+	mpirun -np 8 ./$(TARGET) parallel2d 7072 7072 100 weak_p8 0
+
+	mpirun --oversubscribe -np 16 ./$(TARGET) parallel2d 10000 10000 100 weak_p16 0
+
+# =========================
 # CLEAN
 # =========================
 
 clean:
-	rm -f build/* output/pgm/*.pgm output/ppm/*.ppm output/txt/*.txt
+	rm -f build/* \
+	output/pgm/*.pgm \
+	output/ppm/*.ppm \
+	output/txt/*.txt \
+	output/benchmarks/*.csv \
+	output/graphs/*.png
+
+# =========================
+# PYTHON ENVIRONMENT
+# =========================
+
+venv:
+	python -m venv .venv
+	$(PIP) install pandas matplotlib
+
+analyze_benchmarks:
+	$(PYTHON) scripts/analyze_benchmarks.py

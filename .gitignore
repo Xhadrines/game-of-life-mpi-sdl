@@ -1,4 +1,9 @@
 output/pgm/*.pgm
 output/ppm/*.ppm
 output/txt/*.txt
+output/benchmarks/*.csv
+output/graphs/*.png
 build/*
+
+.venv/*
+venv/*

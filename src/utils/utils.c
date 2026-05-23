@@ -148,3 +148,61 @@ int write_output_files(
 
     return ok_pgm && ok_ppm && ok_txt;
 }
+
+int append_benchmark_csv(
+    const char *run_name,
+    const char *mode,
+    int processes,
+    int rows,
+    int cols,
+    int steps,
+    double total_time,
+    double communication_time,
+    double computation_time
+) {
+    FILE *check = fopen("output/benchmarks/benchmark_results.csv", "r");
+
+    int file_exists = check != NULL;
+
+    if (check) {
+        fclose(check);
+    }
+
+    FILE *f = fopen("output/benchmarks/benchmark_results.csv", "a");
+
+    if (!f) {
+        perror("fopen");
+        return 0;
+    }
+
+    if (!file_exists) {
+        fprintf(f, "run_name,mode,processes,rows,cols,steps,total_time,communication_time,computation_time,communication_percent\n");
+        
+    }
+
+    double communication_percent = 0.0;
+
+    if (total_time > 0.0) {
+        communication_percent =
+            (communication_time / total_time) * 100.0;
+    }
+
+    fprintf(
+        f,
+        "%s,%s,%d,%d,%d,%d,%.6f,%.6f,%.6f,%.2f\n",
+        run_name,
+        mode,
+        processes,
+        rows,
+        cols,
+        steps,
+        total_time,
+        communication_time,
+        computation_time,
+        communication_percent
+    );
+
+    fclose(f);
+
+    return 1;
+}

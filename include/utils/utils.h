@@ -45,4 +45,16 @@ int write_output_files(
     int cols
 );
 
+int append_benchmark_csv(
+    const char *run_name,
+    const char *mode,
+    int processes,
+    int rows,
+    int cols,
+    int steps,
+    double total_time,
+    double communication_time,
+    double computation_time
+);
+
 #endif

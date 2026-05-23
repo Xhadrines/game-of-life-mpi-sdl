@@ -37,7 +37,10 @@ Implementare paralelă a jocului Conway's Game of Life folosind MPI și SDL2.
 - Export automat pentru fișiere `.pgm`, `.ppm` și `.txt` (`.txt` doar pentru grile mici)
 - Validare automată pentru împărțirea corectă a gridului între procese MPI
 - Control complet din tastatură
-- Creare automată pentru directoarele `build/`, `output/pgm/`, `output/ppm/` și `output/txt/`
+- Măsurare performanță cu `MPI_Wtime`: timp total, timp comunicație și timp calcul
+- Export rezultate benchmark în format `.csv`
+- Generare grafice pentru speedup, eficiență, weak scaling și timp calcul vs comunicație
+- Creare automată pentru directoarele `build/` și `output/*`
 
 ## Tehnologii folosite
 
@@ -45,6 +48,9 @@ Implementare paralelă a jocului Conway's Game of Life folosind MPI și SDL2.
 - OpenMPI (v5.0.10 sau o versiune mai mare)
 - SDL2
 - SDL2_ttf
+- Python 3
+- pandas
+- matplotlib
 
 ## Instalare
 
@@ -66,6 +72,12 @@ cd game-of-life-mpi-sdl
 sudo pacman -S gcc openmpi sdl2 sdl2_ttf ttf-dejavu
 ```
 
+4. Creează mediul virtual Python pentru benchmark analysis
+
+```bash
+make venv
+```
+
 ## Compilare
 
 ```bash
@@ -73,12 +85,6 @@ make
 ```
 
 ## Rulare
-
-> Pattern-uri disponibile pentru modurile 2D:
->
-> - `0` = random
-> - `1` = glider
-> - `2` = blinker
 
 ### Interfață SDL2
 
@@ -106,12 +112,6 @@ make run12
 make run16
 ```
 
-#### Sau manual:
-
-```bash
-mpirun -np 4 ./build/gol_mpi app
-```
-
 ---
 
 ### Rulare Parallel Console
@@ -122,34 +122,16 @@ mpirun -np 4 ./build/gol_mpi app
 make parallel1d
 ```
 
-#### Sau manual:
-
-```bash
-mpirun -np 4 ./build/gol_mpi parallel1d 1000 500 parallel1d
-```
-
 #### 2D Parallel
 
 ```bash
 make parallel2d
 ```
 
-#### Sau manual:
-
-```bash
-mpirun -np 4 ./build/gol_mpi parallel2d 500 500 1000 parallel2d 0
-```
-
 #### 2D Parallel Toroidal
 
 ```bash
 make parallel2d_toroidal
-```
-
-#### Sau manual:
-
-```bash
-mpirun -np 4 ./build/gol_mpi parallel2d_toroidal 500 500 1000 parallel2d_toroidal 0
 ```
 
 ---
@@ -162,22 +144,10 @@ mpirun -np 4 ./build/gol_mpi parallel2d_toroidal 500 500 1000 parallel2d_toroida
 make serial1d
 ```
 
-#### Sau manual:
-
-```bash
-./build/gol_mpi serial1d 1000 500 serial1d
-```
-
 #### 2D Serial
 
 ```bash
 make serial2d
-```
-
-#### Sau manual:
-
-```bash
-./build/gol_mpi serial2d 500 500 1000 serial2d 0
 ```
 
 ---
@@ -190,22 +160,10 @@ make serial2d
 make benchmark2d_parallel
 ```
 
-#### Sau manual
-
-```bash
-mpirun -np 8 ./build/gol_mpi parallel2d 10000 10000 100 benchmark_2d_parallel 0
-```
-
 #### Parallel 2D Toroidal Benchmark (10000x10000)
 
 ```bash
 make benchmark2d_parallel_toroidal
-```
-
-#### Sau manual
-
-```bash
-mpirun -np 8 ./build/gol_mpi parallel2d_toroidal 10000 10000 100 benchmark_2d_toroidal 0
 ```
 
 #### Serial 2D Benchmark (10000x10000)
@@ -214,10 +172,22 @@ mpirun -np 8 ./build/gol_mpi parallel2d_toroidal 10000 10000 100 benchmark_2d_to
 make benchmark2d_serial
 ```
 
-#### Sau manual
+#### Strong Scaling Benchmark (10000x10000)
 
 ```bash
-./build/gol_mpi serial2d 10000 10000 100 benchmark_2d_serial 0
+make strong_scaling
+```
+
+#### Weak Scaling Benchmark (10000x10000)
+
+```bash
+make weak_scaling
+```
+
+## Analiză benchmark și generare grafice
+
+```bash
+make analyze_benchmarks
 ```
 
 ## Structura proiectului
@@ -250,9 +220,14 @@ game-of-life-mpi-sdl/
 │       └── utils.h
 │
 ├── output/
+│   ├── benchmarks/
+│   ├── graphs/
 │   ├── pgm/
 │   ├── ppm/
 │   └── txt/
+│
+├── scripts/
+│   └── analyze_benchmarks.py
 │
 ├── src/
 │   ├── core/
@@ -321,4 +296,11 @@ Exemplu:
 output/pgm/rezultat_2d_parallel.pgm
 output/ppm/rezultat_2d_parallel.ppm
 output/txt/rezultat_2d_parallel.txt
+output/benchmarks/benchmark_results.csv
+output/benchmarks/strong_scaling_analysis.csv
+output/benchmarks/weak_scaling_analysis.csv
+output/graphs/speedup.png
+output/graphs/efficiency.png
+output/graphs/communication_vs_computation.png
+output/graphs/weak_scaling.png
 ```
