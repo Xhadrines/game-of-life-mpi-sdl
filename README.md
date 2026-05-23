@@ -92,22 +92,6 @@ make parallel1d
 #### Sau manual:
 
 ```bash
-mpirun -np 4 ./build/gol_mpi app
-```
-
----
-
-### Rulare Parallel Console
-
-#### 1D Parallel
-
-```bash
-make parallel1d
-```
-
-#### Sau manual:
-
-```bash
 mpirun -np 4 ./build/gol_mpi parallel1d 1000 500 output/parallel1d.pgm
 ```
 
@@ -136,7 +120,7 @@ make serial1d
 #### Sau manual:
 
 ```bash
-mpirun -np 4 ./build/gol_mpi serial1d 1000 500 output/serial1d.pgm
+./build/gol_mpi serial1d 1000 500 output/serial1d.pgm
 ```
 
 #### 2D Serial
@@ -148,7 +132,35 @@ make serial2d
 #### Sau manual:
 
 ```bash
-mpirun -np 4 ./build/gol_mpi serial2d 500 500 1000 output/serial2d.pgm
+./build/gol_mpi serial2d 500 500 1000 output/serial2d.pgm
+```
+
+---
+
+### HPC Benchmarks (console only)
+
+#### Parallel 2D Benchmark (10000x10000)
+
+```bash
+make benchmark2d
+```
+
+#### Sau manual
+
+```bash
+mpirun -np 8 ./build/gol_mpi parallel2d 10000 10000 100 output/benchmark_2d_parallel.pgm
+```
+
+#### Serial 2D Benchmark (10000x10000)
+
+```bash
+make benchmark2d_serial
+```
+
+#### Sau manual
+
+```bash
+./build/gol_mpi serial2d 10000 10000 100 output/benchmark_2d_serial.pgm
 ```
 
 ## Structura proiectului

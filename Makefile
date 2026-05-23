@@ -53,6 +53,18 @@ serial2d: $(TARGET)
 	./$(TARGET) serial2d 500 500 1000 output/serial2d.pgm
 
 # =========================
+# HPC BENCHMARKS
+# =========================
+
+benchmark2d_parallel:
+	@echo "Please wait... running MPI 2D benchmark 10000x10000"
+	mpirun -np 8 ./$(TARGET) parallel2d 10000 10000 100 output/benchmark_2d_parallel.pgm
+
+benchmark2d_serial:
+	@echo "Please wait... running SERIAL 2D benchmark 10000x10000"
+	./$(TARGET) serial2d 10000 10000 100 output/benchmark_2d_serial.pgm
+
+# =========================
 # CLEAN
 # =========================
 
